@@ -1,8 +1,7 @@
 #pragma once
-#include "EvieWin.h"
+#include "stdafx.h"
+#include "Keyboard.h"
 #include "ExceptionBase.h"
-
-
 
 
 class Window
@@ -27,9 +26,6 @@ private:
 	{
 	public:
 
-
-
-	
 		static const wchar_t* GetName() noexcept;
 		static HINSTANCE GetInstance() noexcept;
 
@@ -47,6 +43,7 @@ public:
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
+	void ChangeTitle(const std::string& str) noexcept;
 
 private:
 	static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -57,6 +54,9 @@ private:
 	int width;
 	int height;
 	HWND hWndSto;
+
+	Keyboard kbd;
+
 };
 
 

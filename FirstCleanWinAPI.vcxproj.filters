@@ -33,6 +33,9 @@
     <ClCompile Include="source\ExceptionBase.cpp">
       <Filter>Source Files\BaseClasses</Filter>
     </ClCompile>
+    <ClCompile Include="source\Keyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="source\FirstCleanWinAPI.rc">
@@ -58,15 +61,13 @@
     <ClInclude Include="source\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\Keyboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="source\FirstCleanWinAPI.aps">
-      <Filter>Header Files</Filter>
-    </None>
   </ItemGroup>
 </Project>

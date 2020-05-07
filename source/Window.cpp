@@ -33,23 +33,19 @@ Window::WindowClass::WindowClass() noexcept
 	RegisterClassEx(&wc);
 }
 
-Window::WindowClass::~WindowClass()
-{
+Window::WindowClass::~WindowClass() {
 	UnregisterClass(wndClassName, GetInstance());
 }
 
-const wchar_t* Window::WindowClass::GetName() noexcept
-{
+const wchar_t* Window::WindowClass::GetName() noexcept {
 	return wndClassName;
 }
 
-HINSTANCE Window::WindowClass::GetInstance() noexcept
-{
+HINSTANCE Window::WindowClass::GetInstance() noexcept {
 	return wndClass.hInst;
 }
 
-Window::Window(int width, int height, const wchar_t* name) noexcept
-{
+Window::Window(int width, int height, const wchar_t* name) noexcept {
 
 	this->width = width;
 	this->height = height;
@@ -80,9 +76,13 @@ Window::Window(int width, int height, const wchar_t* name) noexcept
 	ShowWindow(hWndSto, SW_SHOWDEFAULT);
 }
 
-Window::~Window() 
-{
+Window::~Window() {
 	DestroyWindow( 0 );
+}
+
+void Window::ChangeTitle(const std::string& str) noexcept {
+	SetWindowTextA(hWndSto, str.c_str());
+
 }
 
 
