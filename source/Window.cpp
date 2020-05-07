@@ -124,22 +124,20 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		PostQuitMessage(99);
 		break;
 	case WM_KEYDOWN:
-		if (wParam == 'R')
-			SetWindowText(hWnd, L"YO MAMA");
+		kbd.OnKeyDown(static_cast<unsigned int>(wParam));
+		ChangeTitle(kbd.KeyDown('g') ? "G": "F");
 		break;
 	case WM_KEYUP:
-		if (wParam == 'R')
-			SetWindowText(hWnd, L"Window");
+		kbd.OnKeyUp(static_cast<unsigned int>(wParam));
 		break;
 	case WM_CHAR:
-		title.push_back((wchar_t)wParam);
-		SetWindowText(hWnd, title.c_str());
+		kbd.OnCharDown(static_cast<char>(wParam));
 		break;
 	case WM_LBUTTONDOWN:
 		POINTS pt = MAKEPOINTS(lParam);
-		std::wstringstream ss;
-		ss << L"(" << pt.x << L", " << pt.y << L")";
-		SetWindowText(hWnd, ss.str().c_str());
+		std::stringstream ss;
+		ss << "(" << pt.x << ", " << pt.y << ")";
+		ChangeTitle(ss.str());
 		break;
 
 	}

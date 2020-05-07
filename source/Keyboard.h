@@ -2,6 +2,7 @@
 #include <bitset>
 #include <queue>
 
+
 class Keyboard {
 	friend class Window;
 public:
