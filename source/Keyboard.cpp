@@ -2,6 +2,8 @@
 #include "Keyboard.h"
 #include <cctype>
 
+namespace InCap {
+
 // return whether the key was pressed once
 bool Keyboard::KeyPressed(char key) {
 	return press.test(std::toupper(key));
@@ -45,3 +47,6 @@ void Keyboard::OnKeyUp(unsigned int key) {
 void Keyboard::OnCharDown(char key) {
 	charBuffer.push(key);
 }
+
+
+} //~namespace InCap

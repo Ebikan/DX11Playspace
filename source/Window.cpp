@@ -77,7 +77,7 @@ Window::Window(int width, int height, const wchar_t* name) noexcept {
 }
 
 Window::~Window() {
-	DestroyWindow( 0 );
+	DestroyWindow(0);
 }
 
 void Window::ChangeTitle(const std::string& str) noexcept {
@@ -93,12 +93,12 @@ LRESULT WINAPI Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 		const CREATESTRUCT* const createStruct = reinterpret_cast<CREATESTRUCT*>(lParam);
 		Window* const winCls = static_cast<Window*>(createStruct->lpCreateParams);
 		//store the window data in the data on the Win32 side
-		SetWindowLongPtr( hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(winCls));
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(winCls));
 
 		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Window::HandleMsgUpdate));
-	
+
 		return winCls->HandleMsg(hWnd, msg, wParam, lParam);
-	
+
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -107,11 +107,11 @@ LRESULT WINAPI Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 
 LRESULT WINAPI Window::HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	
+
 	Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 	return pWnd->HandleMsg(hWnd, msg, wParam, lParam);
-	
+
 }
 
 LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -125,7 +125,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		break;
 	case WM_KEYDOWN:
 		kbd.OnKeyDown(static_cast<unsigned int>(wParam));
-		ChangeTitle(kbd.KeyDown('g') ? "G": "F");
+		ChangeTitle(kbd.KeyDown('g') ? "G" : "F");
 		break;
 	case WM_KEYUP:
 		kbd.OnKeyUp(static_cast<unsigned int>(wParam));

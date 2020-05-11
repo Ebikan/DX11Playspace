@@ -54,7 +54,7 @@ private:
 	int height;
 	HWND hWndSto;
 
-	Keyboard kbd;
+	InCap::Keyboard kbd;
 
 };
 
