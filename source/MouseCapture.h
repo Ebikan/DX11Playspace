@@ -71,7 +71,14 @@ public:
 	};
 
 public:
-	MouseCapture() = default;
+	MouseCapture()
+		:
+		isInWindow(false),
+		leftIsPressed(false),
+		rightIsPressed(false),
+		x(0),
+		y(0)
+	{}
 	MouseCapture(const MouseCapture&) = delete;
 	MouseCapture& operator=(const MouseCapture&) = delete;
 	std::pair<int, int> GetPos() const noexcept;
@@ -99,8 +106,8 @@ private:
 	void TrimBuffer() noexcept;
 private:
 	static constexpr unsigned int bufferSize = 16u;
-	int x;
-	int y;
+	int x = 0;
+	int y = 0;
 	bool leftIsPressed = false;
 	bool rightIsPressed = false;
 	bool isInWindow = false;

@@ -26,9 +26,11 @@ private:
 	class WindowClass
 	{
 	public:
-
 		static const wchar_t* GetName() noexcept;
 		static HINSTANCE GetInstance() noexcept;
+		static unsigned short WindowCount() noexcept;
+		static void AddWindowCount() noexcept;
+		static void SubWindowCount() noexcept;
 
 	private:
 		WindowClass() noexcept;
@@ -38,6 +40,8 @@ private:
 		static constexpr const wchar_t* wndClassName = L"Evie's Awesome Window!";
 		static WindowClass wndClass;
 		HINSTANCE hInst;
+		unsigned short instanceCount;
+		
 	};
 public:
 	Window(int width, int height, const wchar_t* name) noexcept;
@@ -54,10 +58,8 @@ private:
 	int width;
 	int height;
 	HWND hWndSto;
-
 	Keyboard kbd;
 	MouseCapture mouse;
-
 };
 
 

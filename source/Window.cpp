@@ -31,6 +31,8 @@ Window::WindowClass::WindowClass() noexcept
 	wc.hIconSm = nullptr;
 
 	RegisterClassEx(&wc);
+
+	instanceCount = 0;
 }
 
 Window::WindowClass::~WindowClass() {
@@ -44,6 +46,19 @@ const wchar_t* Window::WindowClass::GetName() noexcept {
 HINSTANCE Window::WindowClass::GetInstance() noexcept {
 	return wndClass.hInst;
 }
+
+unsigned short Window::WindowClass::WindowCount() noexcept {
+	return wndClass.instanceCount;
+}
+
+void Window::WindowClass::AddWindowCount() noexcept {
+	++wndClass.instanceCount;
+}
+
+void Window::WindowClass::SubWindowCount() noexcept {
+	--wndClass.instanceCount;
+}
+
 
 Window::Window(int width, int height, const wchar_t* name) noexcept {
 
@@ -74,6 +89,8 @@ Window::Window(int width, int height, const wchar_t* name) noexcept {
 	);
 
 	ShowWindow(hWndSto, SW_SHOWDEFAULT);
+
+	WindowClass::AddWindowCount();
 }
 
 Window::~Window() {
@@ -117,6 +134,7 @@ LRESULT WINAPI Window::HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	static std::wstring title;
+	std::stringstream out;
 	POINTS pt;
 
 
@@ -126,7 +144,9 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		/* ------- Start Window Messages -------- */
 
 	case WM_CLOSE:
-		PostQuitMessage(99);
+		WindowClass::SubWindowCount();
+		if (!WindowClass::WindowCount())
+			PostQuitMessage(99);
 		break;
 
 		/* ------- End Window Messages -------- */
@@ -134,6 +154,36 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 		/* ------- Start Mouse Messages -------- */
 
+	case WM_MOUSEMOVE:
+		pt = MAKEPOINTS(lParam);
+
+		// if inside client
+		if (pt.x > 0 && pt.y > 0 && pt.x < width && pt.y < height) {
+			mouse.OnMouseMove(pt.x, pt.y);
+			if (!mouse.IsInWindow()) {
+				mouse.OnMouseEnter(pt.x, pt.y);
+				SetCapture(hWnd);
+			}
+		}
+		// else outside client
+		else {
+			// keep click drag info.
+			if (mouse.LeftIsPressed() || mouse.RightIsPressed()) {
+				mouse.OnMouseMove(pt.x, pt.y);
+			}
+			// no longer click draging
+			else {
+				mouse.OnMouseLeave(pt.x, pt.y);
+				ReleaseCapture();
+			}
+
+		}
+
+
+		
+		out << pt.x << std::endl;
+		OutputDebugStringA(out.str().c_str());
+		break;
 	case WM_LBUTTONDOWN:
 		pt = MAKEPOINTS(lParam);
 		mouse.OnLeftPressed(pt.x, pt.y);
@@ -150,16 +200,13 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		pt = MAKEPOINTS(lParam);
 		mouse.OnRightReleased(pt.x, pt.y);
 		break;
-	case WM_MOUSEMOVE:
-		pt = MAKEPOINTS(lParam);
-		mouse.OnMouseMove(pt.x, pt.y);
-		break;
 	case WM_MOUSEWHEEL:
 	{
 		short delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		pt = MAKEPOINTS(lParam);
 		if (delta > 0)
 			mouse.OnWheelUp(pt.x, pt.y);
+		break;
 	}
 
 		/* ------- End Mouse Messages -------- */
