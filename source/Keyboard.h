@@ -20,6 +20,7 @@ public:
 		Type type;
 		char key;
 	};
+	Keyboard() = default;
 	bool KeyPressed(char key);
 	bool KeyDown(char key) const;
 	bool KeyUp(char key) const;
