@@ -117,12 +117,57 @@ LRESULT WINAPI Window::HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	static std::wstring title;
+	POINTS pt;
+
 
 	switch (msg)
 	{
+
+		/* ------- Start Window Messages -------- */
+
 	case WM_CLOSE:
 		PostQuitMessage(99);
 		break;
+
+		/* ------- End Window Messages -------- */
+
+
+		/* ------- Start Mouse Messages -------- */
+
+	case WM_LBUTTONDOWN:
+		pt = MAKEPOINTS(lParam);
+		mouse.OnLeftPressed(pt.x, pt.y);
+		break;
+	case WM_RBUTTONDOWN:
+		pt = MAKEPOINTS(lParam);
+		mouse.OnLeftReleased(pt.x, pt.y);
+		break;
+	case WM_LBUTTONUP:
+		pt = MAKEPOINTS(lParam);
+		mouse.OnRightPressed(pt.x, pt.y);
+		break;
+	case WM_RBUTTONUP:
+		pt = MAKEPOINTS(lParam);
+		mouse.OnRightReleased(pt.x, pt.y);
+		break;
+	case WM_MOUSEMOVE:
+		pt = MAKEPOINTS(lParam);
+		mouse.OnMouseMove(pt.x, pt.y);
+		break;
+	case WM_MOUSEWHEEL:
+	{
+		short delta = GET_WHEEL_DELTA_WPARAM(wParam);
+		pt = MAKEPOINTS(lParam);
+		if (delta > 0)
+			mouse.OnWheelUp(pt.x, pt.y);
+	}
+
+		/* ------- End Mouse Messages -------- */
+
+
+
+		/* ------- Start Keyboard Messages -------- */
+
 	case WM_KEYDOWN:
 		kbd.OnKeyDown(static_cast<unsigned int>(wParam));
 		ChangeTitle(kbd.KeyDown('g') ? "G" : "F");
@@ -133,14 +178,10 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	case WM_CHAR:
 		kbd.OnCharDown(static_cast<char>(wParam));
 		break;
-	case WM_LBUTTONDOWN:
-		POINTS pt = MAKEPOINTS(lParam);
-		std::stringstream ss;
-		ss << "(" << pt.x << ", " << pt.y << ")";
-		ChangeTitle(ss.str());
-		break;
 
-	}
+		/* ------- End Keyboard Messages -------- */
+
+	} // msg switch end
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 

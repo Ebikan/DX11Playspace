@@ -197,7 +197,11 @@
     <ClInclude Include="source\WindowsMessageMap.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Assets\icon.ico" />
+    <Image Include="Assets\icon.ico">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Assets\iconsm.ico" />
+    <Image Include="source\icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

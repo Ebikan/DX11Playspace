@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "Keyboard.h"
+#include "MouseCapture.h"
 #include "ExceptionBase.h"
 
 
@@ -54,7 +55,8 @@ private:
 	int height;
 	HWND hWndSto;
 
-	InCap::Keyboard kbd;
+	Keyboard kbd;
+	MouseCapture mouse;
 
 };
 

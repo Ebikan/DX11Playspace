@@ -52,7 +52,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON                ICON                    "C:\\Users\\Evie\\Documents\\TestingWorkspace\\FirstCleanWinAPI\\Assets\\icon.ico"
+IDI_ICON                ICON                    "C:\\Users\\Evie\\Documents\\TestingWorkplace\\FirstCleanWinAPI\\Assets\\icon.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
