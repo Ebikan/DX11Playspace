@@ -3,7 +3,7 @@
 #include "Keyboard.h"
 #include "MouseCapture.h"
 #include "ExceptionBase.h"
-
+#include <optional>
 
 class Window
 {
@@ -49,7 +49,8 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 	void ChangeTitle(const std::string& str) noexcept;
-
+	// static to process all messages for the WClass.
+	static std::optional<int> ProcessMessages();
 private:
 	static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT WINAPI HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

@@ -17,7 +17,7 @@ Window::WindowClass::WindowClass() noexcept
 {
 	WNDCLASSEX wc = { 0 };
 
-	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.cbSize = sizeof(wc);
 	wc.style = CS_OWNDC /*| CS_NOCLOSE*/;
 	wc.lpfnWndProc = HandleMsgSetup;
 	wc.cbClsExtra = 0;
@@ -76,6 +76,7 @@ Window::Window(int width, int height, const wchar_t* name) noexcept {
 
 	AdjustWindowRect(&rec, dwStyle, FALSE);
 
+
 	hWndSto = CreateWindowEx(
 		0, WindowClass::GetName(),
 		name,
@@ -98,8 +99,22 @@ Window::~Window() {
 }
 
 void Window::ChangeTitle(const std::string& str) noexcept {
-	SetWindowTextA(hWndSto, str.c_str());
+	if (GetFocus() == hWndSto)
+		SetWindowTextA(hWndSto, str.c_str());
+}
 
+// Message Pump
+std::optional<int> Window::ProcessMessages() {
+	// Run messages till out.
+	MSG msg;
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+		if (msg.message == WM_QUIT) {
+			return msg.wParam;
+		}
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	return {};
 }
 
 
@@ -133,6 +148,11 @@ LRESULT WINAPI Window::HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
+	static WindowsMessageMap mm;
+	OutputDebugStringA(mm(msg, lParam, wParam).c_str());
+
+
+
 	static std::wstring title;
 	std::stringstream out;
 	POINTS pt;
@@ -158,11 +178,11 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		pt = MAKEPOINTS(lParam);
 
 		// if inside client
-		if (pt.x > 0 && pt.y > 0 && pt.x < width && pt.y < height) {
+		if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height) {
 			mouse.OnMouseMove(pt.x, pt.y);
 			if (!mouse.IsInWindow()) {
-				mouse.OnMouseEnter(pt.x, pt.y);
 				SetCapture(hWnd);
+				mouse.OnMouseEnter(pt.x, pt.y);
 			}
 		}
 		// else outside client
@@ -173,20 +193,18 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 			}
 			// no longer click draging
 			else {
-				mouse.OnMouseLeave(pt.x, pt.y);
 				ReleaseCapture();
+				mouse.OnMouseLeave(pt.x, pt.y);
 			}
 
 		}
-
-
-		
-		out << pt.x << std::endl;
-		OutputDebugStringA(out.str().c_str());
+		//out << pt.y << std::endl;
+		//OutputDebugStringA(out.str().c_str());
 		break;
 	case WM_LBUTTONDOWN:
 		pt = MAKEPOINTS(lParam);
 		mouse.OnLeftPressed(pt.x, pt.y);
+		SetForegroundWindow(hWnd);
 		break;
 	case WM_RBUTTONDOWN:
 		pt = MAKEPOINTS(lParam);
@@ -195,10 +213,20 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	case WM_LBUTTONUP:
 		pt = MAKEPOINTS(lParam);
 		mouse.OnRightPressed(pt.x, pt.y);
+		if (pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height)
+		{
+			ReleaseCapture();
+			mouse.OnMouseLeave(pt.x, pt.y);
+		}
 		break;
 	case WM_RBUTTONUP:
 		pt = MAKEPOINTS(lParam);
 		mouse.OnRightReleased(pt.x, pt.y);
+		if (pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height)
+		{
+			ReleaseCapture();
+			mouse.OnMouseLeave(pt.x, pt.y);
+		}
 		break;
 	case WM_MOUSEWHEEL:
 	{
@@ -233,6 +261,9 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 
 }
+
+
+
 
 Window::Exception::Exception(_In_ const char* file, _In_ unsigned int lineNum, _In_ HRESULT hResult) noexcept
 	: ExceptionBase(file, lineNum), hResult(hResult)

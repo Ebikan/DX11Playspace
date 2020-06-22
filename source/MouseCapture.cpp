@@ -48,7 +48,7 @@ void MouseCapture::OnMouseMove(int newx, int newy) noexcept
 void MouseCapture::OnLeftPressed(int newx, int newy) noexcept
 {
 	leftIsPressed = true;
-
+	
 	UNREFERENCED_PARAMETER(newx);
 	UNREFERENCED_PARAMETER(newy);
 
@@ -56,12 +56,12 @@ void MouseCapture::OnLeftPressed(int newx, int newy) noexcept
 	TrimBuffer();
 }
 
-void MouseCapture::OnLeftReleased(int newx, int newy) noexcept
+void MouseCapture::OnLeftReleased(int x, int y) noexcept
 {
 	leftIsPressed = false;
 
-	UNREFERENCED_PARAMETER(newx);
-	UNREFERENCED_PARAMETER(newy);
+	UNREFERENCED_PARAMETER(x);
+	UNREFERENCED_PARAMETER(y);
 	
 	buffer.push(Event(Event::Type::LRelease, *this));
 	TrimBuffer();

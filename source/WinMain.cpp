@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Window.h"
 #include "resource.h"
+#include "App.h"
 
 #define MAX_LOADSTRING 50
 
@@ -25,39 +26,28 @@ int CALLBACK WinMain(
 
 	//create windows
 
-	Window window1(1000,800, L"OWO nowo!!");
-	Window window2(100, 800, L"UwU!!");
-	Window window3(1200, 100, L"Wowow!");
+	//Window window1(1000,800, L"OWO nowo!!");
+	//Window window2(100, 800, L"UwU!!");
+	//Window window3(1200, 100, L"Wowow!");
 
-	//try
-	//{	
-	//	throw WND_EXEPT(static_cast<HRESULT>(ERROR_ALERTED));
-	//}
-	//catch (const ExceptionBase& e)
-	//{
-	//	MessageBoxA(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
-	//}
-	//catch (const std::exception& e)
-	//{
-	//	MessageBoxA(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
-	//}
-	//catch (...)
-	//{
-	//	MessageBoxA(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
-	//}
-
-
-	// message pump
-	MSG msg;
-	BOOL gMessResult;
-	while ((gMessResult = GetMessage(&msg, nullptr, 0, 0)) > 0) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+	try
+	{	
+		App app = App();
+		app.Go();
 	}
-	if (gMessResult == 0)
-		return static_cast<int>(msg.wParam);
-	else
+	catch (const ExceptionBase& e)
 	{
-		return gMessResult;
+		MessageBoxA(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
 	}
+	catch (const std::exception& e)
+	{
+		MessageBoxA(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
+	}
+	catch (...)
+	{
+		MessageBoxA(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
+	}
+
+
+
 }

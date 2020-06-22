@@ -19,6 +19,12 @@
     <Filter Include="Source Files\BaseClasses">
       <UniqueIdentifier>{33560aad-9a50-4d06-8296-9e69788fdf19}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Utility">
+      <UniqueIdentifier>{2dac65d3-2661-4def-ac4f-38487765c4d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{93898893-df53-4b3f-a2cc-0c04fbeaae43}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\WinMain.cpp">
@@ -33,11 +39,17 @@
     <ClCompile Include="source\ExceptionBase.cpp">
       <Filter>Source Files\BaseClasses</Filter>
     </ClCompile>
-    <ClCompile Include="source\Keyboard.cpp">
+    <ClCompile Include="source\App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\Timer.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Keyboard.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
     <ClCompile Include="source\MouseCapture.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,15 +82,18 @@
     <ClInclude Include="source\MouseCapture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="source\App.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Timer.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\iconsm.ico">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Assets\icon.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="source\icon1.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
