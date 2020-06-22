@@ -208,11 +208,11 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		break;
 	case WM_RBUTTONDOWN:
 		pt = MAKEPOINTS(lParam);
-		mouse.OnLeftReleased(pt.x, pt.y);
+		mouse.OnRightPressed(pt.x, pt.y);
 		break;
 	case WM_LBUTTONUP:
 		pt = MAKEPOINTS(lParam);
-		mouse.OnRightPressed(pt.x, pt.y);
+		mouse.OnLeftReleased(pt.x, pt.y);
 		if (pt.x < 0 || pt.x >= width || pt.y < 0 || pt.y >= height)
 		{
 			ReleaseCapture();
