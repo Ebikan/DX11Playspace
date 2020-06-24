@@ -6,7 +6,7 @@
 #include "ExceptionBase.h"
 
 ExceptionBase::ExceptionBase(_In_ const char* file, _In_ UINT lineNum) noexcept
-	: file(file) ,lineNumSto(lineNum)
+	: file(file) , line(lineNum)
 {
 
 }
@@ -15,15 +15,15 @@ const char* ExceptionBase::what() const noexcept
 {
 	std::stringstream ss;
 	ss << GetType() << "_";
-	ss << lineNumSto << "_";
+	ss << line << "_";
 	ss << file << std::endl;
 	strBuffer = ss.str();
 	return strBuffer.c_str();
 }
 
-const int ExceptionBase::lineNum() const noexcept
+const int ExceptionBase::LineNum() const noexcept
 {
-	return lineNumSto;
+	return line;
 }
 
 const char* ExceptionBase::GetType() const noexcept
@@ -42,4 +42,17 @@ const char* ExceptionBase::OutStr(_In_opt_ std::string what, _In_opt_ std::strin
 	ss << "." << std::endl;
 	strBuffer = ss.str();
 	return strBuffer.c_str();
+}
+
+const std::string& ExceptionBase::GetFile() const noexcept
+{
+	return file;
+}
+
+std::string ExceptionBase::GetOriginString() const noexcept
+{
+	std::ostringstream oss;
+	oss << "[File] " << file << std::endl
+		<< "[Line] " << line;
+	return oss.str();
 }

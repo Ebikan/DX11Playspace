@@ -13,8 +13,23 @@
 
 ******************************************************************************/
 #include <d3d11.h>
+#include "ExceptionBase.h"
 
 class Graphics {
+public:
+	// Standard Exception
+	class EStandard : public ExceptionBase {
+	public:
+		using ExceptionBase::ExceptionBase;
+	};
+	// HResult Exception
+	class EHResult : public ExceptionBase {
+	public:
+		EHResult(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle) noexcept;
+		const char* what() const noexcept override;
+		const int lineNum() const noexcept;
+		const char* GetType() const noexcept;
+	};
 public:
 	Graphics(HWND hWnd);
 	Graphics(const Graphics&) = delete;
