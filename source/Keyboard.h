@@ -12,8 +12,8 @@ public:
 			Pressed,
 			Released
 		};
-		Event() : type(Type::Invalid), key(0u) {};
-		Event(Type type, char key) : type(type), key(key) {};
+		Event() noexcept : type(Type::Invalid), key(0u) {};
+		Event(Type type, char key) noexcept : type(type), key(key) {};
 		Event& operator=(const Event&) = delete;
 		Event(const Event&) = delete;
 	private:
@@ -21,17 +21,17 @@ public:
 		char key;
 	};
 	Keyboard() = default;
-	bool KeyPressed(char key);
-	bool KeyDown(char key) const;
-	bool KeyUp(char key) const;
-	char GetChar();
+	bool KeyPressed(char key) noexcept;
+	bool KeyDown(char key) const noexcept;
+	bool KeyUp(char key) const noexcept;
+	char GetChar() noexcept;
 
 private:
 	// private but exposed to Window friend.
 	// unsigned int because wParam is unsigned int.
-	void OnKeyDown(unsigned int key);
-	void OnKeyUp(unsigned int key);
-	void OnCharDown(char key);
+	void OnKeyDown(unsigned int key) noexcept;
+	void OnKeyUp(unsigned int key) noexcept;
+	void OnCharDown(char key) noexcept;
 private:
 	// Do not direct reference in Window. Handled by Keyboard.
 	std::bitset<0xFF> press;

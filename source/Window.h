@@ -4,6 +4,8 @@
 #include "MouseCapture.h"
 #include "ExceptionBase.h"
 #include <optional>
+#include <memory>
+#include "Graphics.h"
 
 class Window
 {
@@ -13,7 +15,7 @@ public:
 	public:
 		Exception(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT hResult) noexcept;
 		const char* what() const noexcept override;
-		virtual const char* GetType() const noexcept override;
+		const char* GetType() const noexcept override;
 		static std::string TranslateErrorCode(_In_ HRESULT hr) noexcept;
 		HRESULT GetErrorCode() const noexcept;
 		std::string GetErrorString() const noexcept;
@@ -37,6 +39,8 @@ private:
 		~WindowClass();
 		WindowClass(const WindowClass&) = delete;
 		WindowClass& operator=(const WindowClass&) = delete;
+		WindowClass(WindowClass&&) = delete;
+		WindowClass& operator=(WindowClass&&) = delete;
 		static constexpr const wchar_t* wndClassName = L"Evie's Awesome Window!";
 		static WindowClass wndClass;
 		HINSTANCE hInst;
@@ -48,12 +52,16 @@ public:
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
-	void ChangeTitle(const std::string& str) noexcept;
+	Window(Window&&) = delete;
+	Window& operator=(Window&&) = delete;
+	void ChangeTitle(_In_ const std::string& str) noexcept;
 	// static to process all messages for the WClass.
-	static std::optional<int> ProcessMessages();
+	static std::optional<int> ProcessMessages() noexcept;
+	// graphics class accessor
+	Graphics& Gfx() noexcept;
 private:
-	static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	static LRESULT WINAPI HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+	static LRESULT WINAPI HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 private:
 	int width;
@@ -61,6 +69,7 @@ private:
 	HWND hWndSto;
 	Keyboard kbd;
 	MouseCapture mouse;
+	std::unique_ptr<Graphics> pGfx;
 };
 
 

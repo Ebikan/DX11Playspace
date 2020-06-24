@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="CoreRecomendedMicro" ToolsVersion="16.0">
+  <Include Path="cppcorecheckrules.ruleset" Action="Default" />
+  <Include Path="mixedrecommendedrules.ruleset" Action="Default" />
+  <Rules AnalyzerId="Microsoft.Analyzers.NativeCodeAnalysis" RuleNamespace="Microsoft.Rules.Native">
+    <Rule Id="C26426" Action="None" />
+    <Rule Id="C26447" Action="None" />
+    <Rule Id="C26461" Action="None" />
+    <Rule Id="C26472" Action="None" />
+  </Rules>
+</RuleSet>

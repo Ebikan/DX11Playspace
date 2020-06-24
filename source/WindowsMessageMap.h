@@ -18,7 +18,6 @@
 *	along with The Chili Direct3D Engine.  If not, see <http://www.gnu.org/licenses/>.    *
 ******************************************************************************************/
 #pragma once
-#include "EvieWin.h"
 #include <unordered_map>
 
 

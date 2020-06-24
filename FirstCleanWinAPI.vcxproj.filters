@@ -25,6 +25,9 @@
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{93898893-df53-4b3f-a2cc-0c04fbeaae43}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{4ed090c6-fc77-4048-ac5f-8ca4d4a4819b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\WinMain.cpp">
@@ -50,6 +53,12 @@
     </ClCompile>
     <ClCompile Include="source\MouseCapture.cpp">
       <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Graphics.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="source\stdafx.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +97,9 @@
     <ClInclude Include="source\Timer.h">
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="source\Graphics.h">
+      <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\iconsm.ico">
@@ -96,5 +108,10 @@
     <Image Include="Assets\icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="RuleOfFive.snippet">
+      <Filter>Source Files</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

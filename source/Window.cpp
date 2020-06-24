@@ -66,7 +66,7 @@ Window::Window(int width, int height, const wchar_t* name) noexcept {
 	this->height = height;
 
 
-	DWORD dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_MAXIMIZEBOX;
+	DWORD constexpr dwStyle = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_MAXIMIZEBOX;
 
 	RECT rec;
 	rec.left = 0;
@@ -90,26 +90,29 @@ Window::Window(int width, int height, const wchar_t* name) noexcept {
 	);
 
 	ShowWindow(hWndSto, SW_SHOWDEFAULT);
-
 	WindowClass::AddWindowCount();
+
+	// Create Graphics
+	pGfx = std::make_unique<Graphics>( hWndSto );
+
 }
 
 Window::~Window() {
-	DestroyWindow(0);
+	DestroyWindow(hWndSto);
 }
 
-void Window::ChangeTitle(const std::string& str) noexcept {
+void Window::ChangeTitle(_In_ const std::string& str) noexcept {
 	if (GetFocus() == hWndSto)
 		SetWindowTextA(hWndSto, str.c_str());
 }
 
 // Message Pump
-std::optional<int> Window::ProcessMessages() {
+std::optional<int> Window::ProcessMessages() noexcept {
 	// Run messages till out.
 	MSG msg;
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 		if (msg.message == WM_QUIT) {
-			return msg.wParam;
+			return static_cast<int>(msg.wParam);
 		}
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -117,16 +120,30 @@ std::optional<int> Window::ProcessMessages() {
 	return {};
 }
 
+Graphics& Window::Gfx() noexcept
+{
+	return *pGfx;
+}
 
-LRESULT WINAPI Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+
+LRESULT WINAPI Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	if (msg == WM_NCCREATE)
 	{
+		VoidCasting_IKnowWhatIAmDoing
 		const CREATESTRUCT* const createStruct = reinterpret_cast<CREATESTRUCT*>(lParam);
+		
 		Window* const winCls = static_cast<Window*>(createStruct->lpCreateParams);
+		if (!winCls) {
+			PostQuitMessage(1);
+			return NULL;
+		}
+
 		//store the window data in the data on the Win32 side
+		VoidCasting_IKnowWhatIAmDoing
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(winCls));
 
+		VoidCasting_IKnowWhatIAmDoing
 		SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Window::HandleMsgUpdate));
 
 		return winCls->HandleMsg(hWnd, msg, wParam, lParam);
@@ -137,11 +154,14 @@ LRESULT WINAPI Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 
 }
 
-LRESULT WINAPI Window::HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI Window::HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
-
+	VoidCasting_IKnowWhatIAmDoing
 	Window* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-
+	if (!pWnd) {
+		PostQuitMessage(2);
+		return NULL;
+	}
 	return pWnd->HandleMsg(hWnd, msg, wParam, lParam);
 
 }
@@ -155,7 +175,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 	static std::wstring title;
 	std::stringstream out;
-	POINTS pt;
+	POINTS pt = {};
 
 
 	switch (msg)
@@ -230,7 +250,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		break;
 	case WM_MOUSEWHEEL:
 	{
-		short delta = GET_WHEEL_DELTA_WPARAM(wParam);
+		short const delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		pt = MAKEPOINTS(lParam);
 		if (delta > 0)
 			mouse.OnWheelUp(pt.x, pt.y);
@@ -288,11 +308,11 @@ const char* Window::Exception::what() const noexcept
 }
 
 
-std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
+std::string Window::Exception::TranslateErrorCode(_In_ HRESULT hr) noexcept
 {
 	char* pMsgBuf = nullptr;
 	// windows will allocate memory for err string and make our pointer point to it
-	DWORD nMsgLen = FormatMessageA(
+	DWORD const nMsgLen = FormatMessageA(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),

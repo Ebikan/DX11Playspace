@@ -3,8 +3,10 @@
 #include <iomanip>
 #include <sstream>
 #include "App.h"
+#include "Graphics.h"
+#include "Window.h"
 
-App::App() : wnd(1200, 950, L"AppWindow.woot") {}
+App::App() noexcept : wnd(1200, 950, L"Color Test") {}
 
 int App::Go() {
 	while (true) {
@@ -15,10 +17,11 @@ int App::Go() {
 	}
 }
 
+
 void App::DoFrame() {
 
-	const float time = timer.SinceLast();
-	std::ostringstream oss;
-	oss << "Time Elapsed: " << std::setprecision(1) << std::fixed << time << "s";
-	//wnd.ChangeTitle(oss.str());
+	float const elapsedTime = timer.PeekStart()/2.f;
+
+	wnd.Gfx().ClearBuffer(fabsf(sinf(elapsedTime)), fabsf(sinf(elapsedTime/1.1f+0.19635f)), fabsf(sinf(elapsedTime/1.3f + 0.26635f)));
+	wnd.Gfx().FrameEnd();
 }

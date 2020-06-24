@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "MouseCapture.h"
+#include <queue>
 
 std::pair<int, int> MouseCapture::GetPos() const noexcept {
 	return std::pair<int, int>(x,y);
@@ -24,7 +25,7 @@ bool MouseCapture::IsInWindow() const noexcept {
 MouseCapture::Event MouseCapture::Read() noexcept
 { 
 	if (!buffer.empty()) {
-		Event readEvent = buffer.front();
+		Event const readEvent = buffer.front();
 		buffer.pop();
 	}
 	return Event();
@@ -56,12 +57,12 @@ void MouseCapture::OnLeftPressed(int newx, int newy) noexcept
 	TrimBuffer();
 }
 
-void MouseCapture::OnLeftReleased(int x, int y) noexcept
+void MouseCapture::OnLeftReleased(int newx, int newy) noexcept
 {
 	leftIsPressed = false;
 
-	UNREFERENCED_PARAMETER(x);
-	UNREFERENCED_PARAMETER(y);
+	UNREFERENCED_PARAMETER(newx);
+	UNREFERENCED_PARAMETER(newy);
 	
 	buffer.push(Event(Event::Type::LRelease, *this));
 	TrimBuffer();

@@ -71,7 +71,7 @@ public:
 	};
 
 public:
-	MouseCapture()
+	MouseCapture() noexcept
 		:
 		isInWindow(false),
 		leftIsPressed(false),
