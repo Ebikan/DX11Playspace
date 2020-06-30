@@ -44,7 +44,7 @@ const char* BaseException::OutStr(_In_opt_ std::string what, _In_opt_ std::strin
 	return strBuffer.c_str();
 }
 
-const std::string& BaseException::GetFile() const noexcept
+const char* BaseException::GetFile() const noexcept
 {
 	return file;
 }

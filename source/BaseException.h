@@ -10,7 +10,7 @@ public:
 	const char* what() const noexcept override;
 	const int LineNum() const noexcept;
 	virtual const char* GetType() const noexcept;
-	const std::string& GetFile() const noexcept;
+	const char* GetFile() const noexcept;
 	std::string GetOriginString() const noexcept;
 	virtual const char* OutStr(_In_opt_ std::string EXType = "BaseException", _In_opt_ std::string xtra = "") const noexcept;
 private:

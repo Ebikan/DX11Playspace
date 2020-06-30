@@ -13,6 +13,7 @@
 
 ******************************************************************************/
 #include <d3d11.h>
+#include <wrl.h>
 #include "DebugLayerInfo.h"
 #include "BaseException.h"
 
@@ -26,13 +27,14 @@ public:
 	// HResult Exception
 	class HResultException : public BaseException {
 	public:
-		HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, _In_ std::string = "") noexcept;
+		HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, std::vector<std::string> info = {"None"}) noexcept;
 		const char* what() const noexcept override;
 		const char* GetType() const noexcept override;
 		HRESULT GetErrorCode() const noexcept;
 		std::string GetErrorString() const noexcept;
 		std::string GetErrorDescription() const noexcept;
 	private:
+		std::string info;
 		HRESULT hResult;
 	};
 	// Device was removed from the binding
@@ -41,23 +43,19 @@ public:
 	};
 public:
 	Graphics(_In_ HWND hWnd);
-	Graphics(_In_ const Graphics&) = delete;
-	Graphics& operator=(const Graphics&) = delete;
-	Graphics(Graphics&&) = delete;
-	Graphics& operator=(Graphics&&) = delete;
-	~Graphics();
 	
 	void ClearBuffer(float red, float green, float blue);
 	void FrameEnd();
 
 private:
-#ifndef NDEBUG
+#ifdef _DEBUG
 	DebugLayerInfo infoManager;
 #endif
-	ID3D11Device* pDevice = nullptr;
-	IDXGISwapChain* pSwapChain = nullptr;
-	ID3D11DeviceContext* pContext = nullptr;
-	ID3D11RenderTargetView* pTargetView = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D11Device> pDevice = nullptr;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTargetView = nullptr;
 };
 
 

@@ -15,24 +15,10 @@
 
 #include "Graphics.h"
 #include <sstream>
+#include <vector>
+
 
 //#pragma comment(lib, "d3d11.lib") force linker
-
-// graphics exception checking/throwing macros (some with dxgi infos)
-#define GFX_EXCEPT_NOINFO(hr) Graphics::HrException( __LINE__,__FILE__,(hr) )
-#define GFX_THROW_NOINFO(hrcall) if( FAILED( hr = (hrcall) ) ) throw Graphics::HResultException( __LINE__,__FILE__,hr )
-
-#ifndef NDEBUG
-#define GFX_EXCEPT(hr) Graphics::HResultException( __LINE__,__FILE__,(hr),infoManager.GetMessages() )
-#define GFX_THROW_INFO(hrcall) infoManager.Set(); if( FAILED( hr = (hrcall) ) ) throw GFX_EXCEPT(hr)
-#define GFX_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException( __LINE__,__FILE__,(hr),infoManager.GetMessages() )
-#else
-#define GFX_EXCEPT(hr) Graphics::HrException( __LINE__,__FILE__,(hr) )
-#define GFX_THROW_INFO(hrcall) GFX_THROW_NOINFO(hrcall)
-#define GFX_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException( __LINE__,__FILE__,(hr) )
-#endif
-
-
 
 Graphics::Graphics(_In_ HWND hWnd) {
 
@@ -49,16 +35,25 @@ Graphics::Graphics(_In_ HWND hWnd) {
 	SwapChainDesc.SampleDesc.Quality = 0;
 	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	SwapChainDesc.BufferCount = 1;
-	SwapChainDesc.OutputWindow = (HWND)hWnd;
+	SwapChainDesc.OutputWindow = (HWND)0;
 	SwapChainDesc.Windowed = true; //dont force, use IDXGISwapChain::SetFullscreenState
 	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;   //change to flip model in EvWin BLT 
 	SwapChainDesc.Flags = 0;
+
+
+#ifdef _DEBUG
+	infoManager.Set();
+#endif // _DEBUG
 
 	HRESULT const hr = D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
-		D3D11_CREATE_DEVICE_DEBUG,	//Device flags, use D3D11_CREATE_DEVICE_FLAGS for debug and 3-2d integrate.
+#ifdef _DEBUG
+		D3D11_CREATE_DEVICE_DEBUG | D3D11_CREATE_DEVICE_BGRA_SUPPORT,
+#else // _DEBUG
+		D3D11_CREATE_DEVICE_BGRA_SUPPORT,	//Device flags, use D3D11_CREATE_DEVICE_FLAGS for debug and 3-2d integrate.
+#endif
 		nullptr,
 		NULL,
 		D3D11_SDK_VERSION,
@@ -69,31 +64,18 @@ Graphics::Graphics(_In_ HWND hWnd) {
 		&pContext
 	);
 	if (FAILED(hr)) {
+#ifdef _DEBUG
+		throw Graphics::HResultException(__FILE__, __LINE__, hr, infoManager.GetMessages());
+#else
 		throw Graphics::HResultException(__FILE__, __LINE__, hr);
+#endif // _DEBUG
 	}
 
-	ID3D11Resource* pBackBuffer = nullptr;
-	VoidCasting_IKnowWhatIAmDoing
-		pSwapChain->GetBuffer(0u, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer));
+	Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer = nullptr;
+		pSwapChain->GetBuffer(0u, __uuidof(ID3D11Resource), &pBackBuffer);
 	if (pBackBuffer) {
-		pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pTargetView);
+		pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTargetView);
 		pBackBuffer->Release();
-	}
-}
-
-Graphics::~Graphics()
-{
-	if (pDevice != nullptr) {
-		pDevice->Release();
-	}
-	if (pSwapChain != nullptr) {
-		pSwapChain->Release();
-	}
-	if (pContext != nullptr) {
-		pContext->Release();
-	}
-	if (pTargetView != nullptr) {
-		pTargetView->Release();
 	}
 }
 
@@ -101,28 +83,55 @@ void Graphics::ClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red, green, blue, 1.f };
 #pragma warning(suppress:26485) // Pointer decay not preventable. Sent to API.
-	pContext->ClearRenderTargetView(pTargetView, color);
+	pContext->ClearRenderTargetView(pTargetView.Get(), color);
 }
 
 void Graphics::FrameEnd() {
 	HRESULT hr;
+#ifdef _DEBUG 
+	infoManager.Set();
+#endif 
 	if (FAILED(hr = pSwapChain->Present(1u, 0u))) {
 		if (hr == DXGI_ERROR_DEVICE_REMOVED)
 		{
+#ifdef _DEBUG 
+			throw Graphics::DeviceRemovedException(__LOC__, hr, infoManager.GetMessages());
+#else
 			throw Graphics::DeviceRemovedException(__LOC__, hr);
+#endif
 		}
 		else {
+#ifdef _DEBUG 
+			if (FAILED(hr)) throw Graphics::DeviceRemovedException(__LOC__, hr, infoManager.GetMessages());
+#else
 			if (FAILED(hr)) throw Graphics::DeviceRemovedException(__LOC__, hr);
+#endif
 		}
 	}
 }
 
-Graphics::HResultException::HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, _In_ std::string) noexcept
+Graphics::HResultException::HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, std::vector<std::string> msgVec) noexcept
 	:
 	BaseException::BaseException(file, lineNum),
 	hResult(handle)
 {
-		
+
+#ifdef _DEBUG
+
+
+	// join all info messages with newlines into single string
+	for (const std::string& m : msgVec)
+	{
+		info += m;
+		info.push_back('\n');
+	}
+	// remove final newline if exists
+	if (!info.empty())
+	{
+		info.pop_back();
+	}
+#endif // _DEBUG
+
 }
 
 const char* Graphics::HResultException::what() const noexcept
@@ -151,9 +160,9 @@ const char* Graphics::HResultException::what() const noexcept
 		std::stringstream buffer;
 		buffer
 			<< GetOriginString() << endl
-			<< "[Description]: " << error << endl
+			<< "[Description] " << error << endl
 			<< "[Error Code] 0x" << hex << uppercase << GetErrorCode() << endl
-			<< endl;
+			<< "[Info] " << info << endl;
 		LocalFree(error);
 		error = nullptr;
 		strBuffer = buffer.str();

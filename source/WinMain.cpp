@@ -28,8 +28,7 @@ int CALLBACK WinMain(
 
 	try
 	{	
-		App app = App(L"Color Test");
-		app.Go();
+		return App(L"wow").Go();
 	}
 	catch (const BaseException& e)
 	{
