@@ -19,14 +19,13 @@
 #include <dxgidebug.h>
 
 DebugLayerInfo::DebugLayerInfo() {
-	// define what the DXGIGetDebugInterface will look like
+	// define the function signature of DXGIGetDebugInterface
 	typedef HRESULT(WINAPI* DXGIGetDebugInterface)(REFIID, void**);
 	const auto hModDxgiDebug = LoadLibraryEx(L"dxgidebug.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
 	if (hModDxgiDebug == nullptr) {
 		throw Window::Exception(__FILE__, (UINT)__LINE__, GetLastError());
 	}
-	// fetch the DXGIGetDebugInterface frow dxgidebug.dll
-	VoidCasting_IKnowWhatIAmDoing
+	// get address of DXGIGetDebugInterface in dxgidebug.dll
 	FARPROC debugInterface = (GetProcAddress(hModDxgiDebug, "DXGIGetDebugInterface"));
 	VoidCasting_IKnowWhatIAmDoing
 	const auto DxgiGetDebugInterface = reinterpret_cast<DXGIGetDebugInterface>(debugInterface);
@@ -34,17 +33,11 @@ DebugLayerInfo::DebugLayerInfo() {
 	{
 		throw Window::Exception(__FILE__, (UINT)__LINE__, GetLastError());
 	}
-	VoidCasting_IKnowWhatIAmDoing
-		HRESULT const hr = DxgiGetDebugInterface(__uuidof(IDXGIInfoQueue), reinterpret_cast<void**>(&pInfoQueue));
+	HRESULT const hr = DxgiGetDebugInterface(__uuidof(IDXGIInfoQueue), &pInfoQueue);
 
 	if (FAILED(hr)) throw Graphics::HResultException(__LOC__, hr);
 }
 
-DebugLayerInfo::~DebugLayerInfo() {
-	if (pInfoQueue != nullptr) {
-		pInfoQueue->Release();
-	}
-}
 
 void DebugLayerInfo::Set() noexcept
 {

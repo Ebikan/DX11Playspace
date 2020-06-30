@@ -43,6 +43,11 @@ public:
 	};
 public:
 	Graphics(_In_ HWND hWnd);
+	~Graphics() = default;
+	Graphics(_In_ const Graphics&) = delete;
+	Graphics& operator=(const Graphics&) = delete;
+	Graphics(Graphics&&) = delete;
+	Graphics& operator=(Graphics&&) = delete;
 	
 	void ClearBuffer(float red, float green, float blue);
 	void FrameEnd();
@@ -52,10 +57,10 @@ private:
 	DebugLayerInfo infoManager;
 #endif
 
-	Microsoft::WRL::ComPtr<ID3D11Device> pDevice = nullptr;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain = nullptr;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext = nullptr;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTargetView = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTargetView;
 };
 
 

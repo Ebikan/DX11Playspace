@@ -14,6 +14,8 @@
 ******************************************************************************/
 
 #include <vector>
+#include <dxgidebug.h>
+#include <wrl.h>
 #include <string>
 
 class DebugLayerInfo {
@@ -21,7 +23,7 @@ class DebugLayerInfo {
 public:
 
 	DebugLayerInfo();
-	~DebugLayerInfo() noexcept;
+	~DebugLayerInfo() = default;
 	DebugLayerInfo(const DebugLayerInfo&) = delete;
 	DebugLayerInfo& operator=(const DebugLayerInfo&) = delete;
 	DebugLayerInfo(DebugLayerInfo&&) = delete;
@@ -30,6 +32,6 @@ public:
 	std::vector<std::string> GetMessages() const;
 private:
 	unsigned long long next = 0u;
-	struct IDXGIInfoQueue* pInfoQueue = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIInfoQueue> pInfoQueue;
 
 };

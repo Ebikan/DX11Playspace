@@ -35,7 +35,7 @@ Graphics::Graphics(_In_ HWND hWnd) {
 	SwapChainDesc.SampleDesc.Quality = 0;
 	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	SwapChainDesc.BufferCount = 1;
-	SwapChainDesc.OutputWindow = (HWND)0;
+	SwapChainDesc.OutputWindow = hWnd;
 	SwapChainDesc.Windowed = true; //dont force, use IDXGISwapChain::SetFullscreenState
 	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;   //change to flip model in EvWin BLT 
 	SwapChainDesc.Flags = 0;
@@ -75,7 +75,6 @@ Graphics::Graphics(_In_ HWND hWnd) {
 		pSwapChain->GetBuffer(0u, __uuidof(ID3D11Resource), &pBackBuffer);
 	if (pBackBuffer) {
 		pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTargetView);
-		pBackBuffer->Release();
 	}
 }
 
