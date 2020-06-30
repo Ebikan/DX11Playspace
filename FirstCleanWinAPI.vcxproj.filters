@@ -28,6 +28,9 @@
     <Filter Include="Source Files\Graphics">
       <UniqueIdentifier>{4ed090c6-fc77-4048-ac5f-8ca4d4a4819b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Debug Struff">
+      <UniqueIdentifier>{77b8f82a-07a5-4e9e-93f3-190e6c4800b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\WinMain.cpp">
@@ -38,9 +41,6 @@
     </ClCompile>
     <ClCompile Include="source\WindowsMessageMap.cpp">
       <Filter>Source Files\WinAPI</Filter>
-    </ClCompile>
-    <ClCompile Include="source\ExceptionBase.cpp">
-      <Filter>Source Files\BaseClasses</Filter>
     </ClCompile>
     <ClCompile Include="source\App.cpp">
       <Filter>Source Files</Filter>
@@ -59,6 +59,12 @@
     </ClCompile>
     <ClCompile Include="source\stdafx.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\DebugLayerInfo.cpp">
+      <Filter>Source Files\Debug Struff</Filter>
+    </ClCompile>
+    <ClCompile Include="source\BaseException.cpp">
+      <Filter>Source Files\Debug Struff</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -79,9 +85,6 @@
     <ClInclude Include="source\WindowsMessageMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\ExceptionBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -99,6 +102,12 @@
     </ClInclude>
     <ClInclude Include="source\Graphics.h">
       <Filter>Source Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="source\DebugLayerInfo.h">
+      <Filter>Source Files\Debug Struff</Filter>
+    </ClInclude>
+    <ClInclude Include="source\BaseException.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

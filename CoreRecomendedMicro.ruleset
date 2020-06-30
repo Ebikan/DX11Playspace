@@ -3,9 +3,12 @@
   <Include Path="cppcorecheckrules.ruleset" Action="Default" />
   <Include Path="mixedrecommendedrules.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.Analyzers.NativeCodeAnalysis" RuleNamespace="Microsoft.Rules.Native">
+    <Rule Id="C26414" Action="None" />
     <Rule Id="C26426" Action="None" />
     <Rule Id="C26447" Action="None" />
+    <Rule Id="C26455" Action="None" />
     <Rule Id="C26461" Action="None" />
     <Rule Id="C26472" Action="None" />
+    <Rule Id="C26493" Action="None" />
   </Rules>
 </RuleSet>

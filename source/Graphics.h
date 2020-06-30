@@ -13,26 +13,35 @@
 
 ******************************************************************************/
 #include <d3d11.h>
-#include "ExceptionBase.h"
+#include "DebugLayerInfo.h"
+#include "BaseException.h"
 
 class Graphics {
 public:
 	// Standard Exception
-	class EStandard : public ExceptionBase {
+	class Exception : public BaseException {
 	public:
-		using ExceptionBase::ExceptionBase;
+		using BaseException::BaseException;
 	};
 	// HResult Exception
-	class EHResult : public ExceptionBase {
+	class HResultException : public BaseException {
 	public:
-		EHResult(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle) noexcept;
+		HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, _In_ std::string = "") noexcept;
 		const char* what() const noexcept override;
-		const int lineNum() const noexcept;
-		const char* GetType() const noexcept;
+		const char* GetType() const noexcept override;
+		HRESULT GetErrorCode() const noexcept;
+		std::string GetErrorString() const noexcept;
+		std::string GetErrorDescription() const noexcept;
+	private:
+		HRESULT hResult;
+	};
+	// Device was removed from the binding
+	class DeviceRemovedException : public HResultException {
+		using HResultException::HResultException;
 	};
 public:
-	Graphics(HWND hWnd);
-	Graphics(const Graphics&) = delete;
+	Graphics(_In_ HWND hWnd);
+	Graphics(_In_ const Graphics&) = delete;
 	Graphics& operator=(const Graphics&) = delete;
 	Graphics(Graphics&&) = delete;
 	Graphics& operator=(Graphics&&) = delete;
@@ -42,6 +51,9 @@ public:
 	void FrameEnd();
 
 private:
+#ifndef NDEBUG
+	DebugLayerInfo infoManager;
+#endif
 	ID3D11Device* pDevice = nullptr;
 	IDXGISwapChain* pSwapChain = nullptr;
 	ID3D11DeviceContext* pContext = nullptr;

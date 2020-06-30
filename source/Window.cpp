@@ -60,7 +60,7 @@ void Window::WindowClass::SubWindowCount() noexcept {
 }
 
 
-Window::Window(int width, int height, const wchar_t* name) noexcept {
+Window::Window(int width, int height, const wchar_t* name) {
 
 	this->width = width;
 	this->height = height;
@@ -120,11 +120,11 @@ std::optional<int> Window::ProcessMessages() noexcept {
 	return {};
 }
 
-Graphics& Window::Gfx() noexcept
+Graphics& Window::Gfx()
 {
+
 	return *pGfx;
 }
-
 
 LRESULT WINAPI Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
@@ -169,7 +169,7 @@ LRESULT WINAPI Window::HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	static WindowsMessageMap mm;
-	OutputDebugStringA(mm(msg, lParam, wParam).c_str());
+	//OutputDebugStringA(mm(msg, lParam, wParam).c_str());
 
 
 
@@ -286,7 +286,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 
 Window::Exception::Exception(_In_ const char* file, _In_ unsigned int lineNum, _In_ HRESULT hResult) noexcept
-	: ExceptionBase(file, lineNum), hResult(hResult)
+	: BaseException(file, lineNum), hResult(hResult)
 {
 
 }
@@ -298,13 +298,38 @@ const char* Window::Exception::GetType() const noexcept
 
 const char* Window::Exception::what() const noexcept
 {
-	std::ostringstream oss;
-	oss << GetType() << std::endl
-		<< "[Error Code] " << GetErrorCode() << std::endl
-		<< "[Description] " << GetErrorString() << std::endl
-		<< ExceptionBase::what();
-	strBuffer = oss.str();
-	return strBuffer.c_str();
+	LPSTR error = nullptr;
+
+	FormatMessageA(
+		// use system message tables to retrieve error text
+		FORMAT_MESSAGE_FROM_SYSTEM
+		// allocate buffer on local heap for error text
+		| FORMAT_MESSAGE_ALLOCATE_BUFFER
+		// Important! will fail otherwise, since we're not 
+		// (and CANNOT) pass insertion parameters
+		| FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,    // unused with FORMAT_MESSAGE_FROM_SYSTEM
+		GetErrorCode(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPSTR)&error,  // output 
+		0, // minimum size for output buffer
+		nullptr);   // arguments - see note 
+
+	if (error)
+	{
+		using namespace std;
+		std::stringstream buffer;
+		buffer
+			<< GetOriginString() << endl
+			<< "[Description]: " << error << endl
+			<< "[Error Code] 0x" << hex << uppercase << GetErrorCode() << endl
+			<< endl;
+		LocalFree(error);
+		error = nullptr;
+		strBuffer = buffer.str();
+		return strBuffer.c_str();
+	}
+	return "";
 }
 
 

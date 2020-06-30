@@ -5,7 +5,7 @@ typedef class Timer Timer;
 
 class App {
 public:
-	App() noexcept;
+	App(const wchar_t* name);
 	// full cycle ... message loop + master frame
 	int Go();
 private:

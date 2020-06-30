@@ -112,4 +112,5 @@ private:
 	bool rightIsPressed = false;
 	bool isInWindow = false;
 	std::queue<Event> buffer;
+	
 };

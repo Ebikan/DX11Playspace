@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Keyboard.h"
 #include "MouseCapture.h"
-#include "ExceptionBase.h"
+#include "BaseException.h"
 #include <optional>
 #include <memory>
 #include "Graphics.h"
@@ -10,7 +10,7 @@
 class Window
 {
 public:
-	class Exception : public ExceptionBase
+	class Exception : public BaseException
 	{
 	public:
 		Exception(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT hResult) noexcept;
@@ -48,7 +48,7 @@ private:
 		
 	};
 public:
-	Window(int width, int height, const wchar_t* name) noexcept;
+	Window(int width, int height, const wchar_t* name);
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
@@ -58,7 +58,7 @@ public:
 	// static to process all messages for the WClass.
 	static std::optional<int> ProcessMessages() noexcept;
 	// graphics class accessor
-	Graphics& Gfx() noexcept;
+	Graphics& Gfx();
 private:
 	static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT WINAPI HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -74,3 +74,7 @@ private:
 
 
 #define WND_EXEPT( hr ) Window::Exception(__FILE__, __LINE__, hr)
+// error exception helper macro
+//#define CHWND_EXCEPT( hr ) Window::HrException( __LINE__,__FILE__,(hr) )
+//#define CHWND_LAST_EXCEPT() Window::HrException( __LINE__,__FILE__,GetLastError() )
+//#define CHWND_NOGFX_EXCEPT() Window::NoGfxException( __LINE__,__FILE__ )

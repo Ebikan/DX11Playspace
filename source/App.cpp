@@ -6,7 +6,8 @@
 #include "Graphics.h"
 #include "Window.h"
 
-App::App() noexcept : wnd(1200, 950, L"Color Test") {}
+
+App::App(const wchar_t* name) : wnd(1200, 950, name) {}
 
 int App::Go() {
 	while (true) {

@@ -3,15 +3,15 @@
 #include <sal.h>
 #include <string>
 #include <exception>
-#include "ExceptionBase.h"
+#include "BaseException.h"
 
-ExceptionBase::ExceptionBase(_In_ const char* file, _In_ UINT lineNum) noexcept
+BaseException::BaseException(_In_ const char* file, _In_ UINT lineNum) noexcept
 	: file(file) , line(lineNum)
 {
 
 }
 
-const char* ExceptionBase::what() const noexcept
+const char* BaseException::what() const noexcept
 {
 	std::stringstream ss;
 	ss << GetType() << "_";
@@ -21,19 +21,19 @@ const char* ExceptionBase::what() const noexcept
 	return strBuffer.c_str();
 }
 
-const int ExceptionBase::LineNum() const noexcept
+const int BaseException::LineNum() const noexcept
 {
 	return line;
 }
 
-const char* ExceptionBase::GetType() const noexcept
+const char* BaseException::GetType() const noexcept
 {
 	strBuffer.clear();
-	strBuffer.append("ExceptionBase");
+	strBuffer.append("BaseException");
 	return strBuffer.c_str();
 }
 
-const char* ExceptionBase::OutStr(_In_opt_ std::string what, _In_opt_ std::string xtra) const noexcept
+const char* BaseException::OutStr(_In_opt_ std::string what, _In_opt_ std::string xtra) const noexcept
 {
 	std::stringstream ss;
 	ss << what << "_";
@@ -44,12 +44,12 @@ const char* ExceptionBase::OutStr(_In_opt_ std::string what, _In_opt_ std::strin
 	return strBuffer.c_str();
 }
 
-const std::string& ExceptionBase::GetFile() const noexcept
+const std::string& BaseException::GetFile() const noexcept
 {
 	return file;
 }
 
-std::string ExceptionBase::GetOriginString() const noexcept
+std::string BaseException::GetOriginString() const noexcept
 {
 	std::ostringstream oss;
 	oss << "[File] " << file << std::endl

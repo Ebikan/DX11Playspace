@@ -26,18 +26,16 @@ int CALLBACK WinMain(
 
 	//create windows
 
-	//Window window1(1000,800, L"OWO nowo!!");
-	//Window window2(100, 800, L"UwU!!");
-	//Window window3(1200, 100, L"Wowow!");
-
 	try
 	{	
-		App app = App();
+		App app = App(L"Color Test");
 		app.Go();
 	}
-	catch (const ExceptionBase& e)
+	catch (const BaseException& e)
 	{
-		MessageBoxA(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
+		std::string what = e.what();
+		MessageBoxA(nullptr, what.c_str(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
+		
 	}
 	catch (const std::exception& e)
 	{
@@ -47,7 +45,6 @@ int CALLBACK WinMain(
 	{
 		MessageBoxA(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
-
-
+	return -1;
 
 }
