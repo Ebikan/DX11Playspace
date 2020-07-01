@@ -195,3 +195,7 @@ std::string Graphics::HResultException::GetErrorDescription() const noexcept
 	return std::string();
 }
 
+const char* Graphics::DeviceRemovedException::GetType() const noexcept
+{
+	return "Device Removed Exception";
+}

@@ -29,7 +29,7 @@ public:
 	public:
 		HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, std::vector<std::string> info = {"None"}) noexcept;
 		const char* what() const noexcept override;
-		const char* GetType() const noexcept override;
+		virtual const char* GetType() const noexcept;
 		HRESULT GetErrorCode() const noexcept;
 		std::string GetErrorString() const noexcept;
 		std::string GetErrorDescription() const noexcept;
@@ -40,6 +40,7 @@ public:
 	// Device was removed from the binding
 	class DeviceRemovedException : public HResultException {
 		using HResultException::HResultException;
+		virtual const char* GetType() const noexcept;
 	};
 public:
 	Graphics(_In_ HWND hWnd);
