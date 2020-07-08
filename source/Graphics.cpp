@@ -72,7 +72,7 @@ Graphics::Graphics(_In_ HWND hWnd) {
 	}
 
 	Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer = nullptr;
-		pSwapChain->GetBuffer(0u, __uuidof(ID3D11Resource), &pBackBuffer);
+	pSwapChain->GetBuffer(0u, __uuidof(ID3D11Resource), &pBackBuffer);
 	if (pBackBuffer) {
 		pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTargetView);
 	}
@@ -89,27 +89,81 @@ void Graphics::FrameEnd() {
 	HRESULT hr;
 #ifdef _DEBUG 
 	infoManager.Set();
+
 #endif 
 	if (FAILED(hr = pSwapChain->Present(1u, 0u))) {
 		if (hr == DXGI_ERROR_DEVICE_REMOVED)
 		{
 #ifdef _DEBUG 
-			throw Graphics::DeviceRemovedException(__LOC__, hr, infoManager.GetMessages());
+			throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason(), infoManager.GetMessages());
 #else
-			throw Graphics::DeviceRemovedException(__LOC__, hr);
+			throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason());
 #endif
 		}
 		else {
 #ifdef _DEBUG 
-			if (FAILED(hr)) throw Graphics::DeviceRemovedException(__LOC__, hr, infoManager.GetMessages());
+			if (FAILED(hr)) throw Graphics::HResultException(__LOC__, hr, infoManager.GetMessages());
 #else
-			if (FAILED(hr)) throw Graphics::DeviceRemovedException(__LOC__, hr);
+			if (FAILED(hr)) throw Graphics::HResultException(__LOC__, hr);
 #endif
 		}
 	}
 }
 
-Graphics::HResultException::HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, std::vector<std::string> msgVec) noexcept
+void Graphics::DrawTestTri()
+{
+	namespace wrl = Microsoft::WRL;
+
+	struct Vertex
+	{
+		float x;
+		float y;
+	};
+
+	const Vertex vertices[] = {
+		{0.0f, 0.5f},
+		{0.5f, -0.5f},
+		{-0.5f, -0.5f},
+	};
+
+	D3D11_BUFFER_DESC desc = {
+		sizeof(vertices),
+		D3D11_USAGE_DEFAULT,
+		D3D11_BIND_VERTEX_BUFFER,
+		NULL,
+		NULL,
+		sizeof(Vertex),
+	};
+	D3D11_SUBRESOURCE_DATA const srd = {
+		vertices,
+		NULL,
+		NULL,
+	};
+
+	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
+	HRESULT const hr = pDevice->CreateBuffer(&desc, &srd, &pVertexBuffer);
+
+	if (FAILED(hr)) throw Graphics::HResultException(__LOC__, hr, infoManager.GetMessages());
+
+
+	// Bind vertex buffer to pipeline Input Assembler
+#ifdef _DEBUG 
+	infoManager.Set();
+#endif 
+	UINT constexpr stride = sizeof(Vertex);
+	UINT constexpr offset = 0u;
+	pContext->IASetVertexBuffers(0u, 1u, &pVertexBuffer, &stride, &offset);
+	pContext->Draw(3u, 0u);
+#ifdef _DEBUG 
+	throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason(), infoManager.GetMessages());
+#else
+	throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason());
+#endif
+
+
+}
+
+Graphics::HResultException::HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, _In_opt_ std::vector<std::string> msgVec) noexcept
 	:
 	BaseException::BaseException(file, lineNum),
 	hResult(handle)
@@ -198,4 +252,40 @@ std::string Graphics::HResultException::GetErrorDescription() const noexcept
 const char* Graphics::DeviceRemovedException::GetType() const noexcept
 {
 	return "Device Removed Exception";
+}
+
+Graphics::InfoException::InfoException(_In_ const char* file, _In_ UINT lineNum, _In_opt_ std::vector<std::string> infoMsgs) noexcept
+	:
+	BaseException(file, lineNum)
+{
+	for (const auto& m : infoMsgs) {
+		info += m;
+		info.push_back('\n');
+	}
+	// final line remove.
+	if (!info.empty()) {
+		info.pop_back();
+	}
+}
+
+const char* Graphics::InfoException::what() const noexcept
+{
+	using namespace std;
+	std::stringstream buffer;
+	buffer
+		<< GetOriginString() << endl
+		<< "[Error Info] " << GetErrorInfo() << endl;
+	strBuffer = buffer.str();
+	return strBuffer.c_str();
+
+}
+
+const char* Graphics::InfoException::GetType() const noexcept
+{
+	return "Graphics Info Exception";
+}
+
+std::string Graphics::InfoException::GetErrorInfo() const noexcept
+{
+	return info;
 }

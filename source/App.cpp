@@ -22,7 +22,12 @@ int App::Go() {
 void App::DoFrame() {
 
 	float const elapsedTime = timer.PeekStart()/2.f;
-
+	// Clear Screen
 	wnd.Gfx().ClearBuffer(fabsf(sinf(elapsedTime)), fabsf(sinf(elapsedTime/1.1f+0.19635f)), fabsf(sinf(elapsedTime/1.3f + 0.26635f)));
+	// Frame Operations
+
+	wnd.Gfx().DrawTestTri();
+
+	// End Frame
 	wnd.Gfx().FrameEnd();
 }
