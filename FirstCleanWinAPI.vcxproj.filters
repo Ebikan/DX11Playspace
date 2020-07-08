@@ -134,5 +134,8 @@
     <FxCompile Include="source\VertexShader.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="source\PixelShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
