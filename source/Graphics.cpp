@@ -154,17 +154,52 @@ void Graphics::DrawTestTri()
 	// Bind vertex buffer to pipeline Input Assembler
 	UINT constexpr stride = sizeof(Vertex);
 	UINT constexpr offset = 0u;
-	pContext->IASetVertexBuffers(0u, 1u, &pVertexBuffer, &stride, &offset);
+	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
 
 	// Create Vertex Shader
 	wrl::ComPtr<ID3D11VertexShader> pVertShader;
 	wrl::ComPtr<ID3DBlob> pBlob;
 	D3DReadFileToBlob(L"VertexShader.cso", &pBlob);
 	pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertShader);
+	// Bind Vertex Shader
 	pContext->VSSetShader(pVertShader.Get(), nullptr, 0u);
 
+	// Create Pixel Shader
+	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
+	D3DReadFileToBlob(L"PixelShader.cso", &pBlob);
+	pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader);
+	// Bind Pixel Shader
+	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
+
+	// Set Render Target
+	pContext->OMSetRenderTargets(1u, pTargetView.GetAddressOf(), nullptr);
 
 
+	// Set Viewport
+	DXGI_SWAP_CHAIN_DESC scDesc;
+	pSwapChain->GetDesc(&scDesc);
+
+	D3D11_VIEWPORT view;
+	view.TopLeftX = 0;
+	view.TopLeftY = 0;
+	view.Width = scDesc.BufferDesc.Width;
+	view.Height = scDesc.BufferDesc.Height;
+	view.MinDepth = 0;
+	view.MaxDepth = 1;
+	pContext->RSSetViewports(1u, &view);
+
+	// Set Primitive Topology
+	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+	// Input layout for vertex shader for 2d
+	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
+	const D3D11_INPUT_ELEMENT_DESC ieDesc[] = {
+		{L"Position", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u}
+	};
+
+
+	// Draw
 	pContext->Draw(std::size(vertices), 0u);
 #ifdef _DEBUG 
 	throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason(), infoManager.GetMessages());
