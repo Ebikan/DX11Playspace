@@ -16,8 +16,9 @@
 #include "Graphics.h"
 #include <sstream>
 #include <vector>
+#include <d3dcompiler.h>
 
-
+#pragma comment(lib, "D3DCompiler.lib")
 //#pragma comment(lib, "d3d11.lib") force linker
 
 Graphics::Graphics(_In_ HWND hWnd) {
@@ -146,14 +147,25 @@ void Graphics::DrawTestTri()
 	if (FAILED(hr)) throw Graphics::HResultException(__LOC__, hr, infoManager.GetMessages());
 
 
-	// Bind vertex buffer to pipeline Input Assembler
+
 #ifdef _DEBUG 
 	infoManager.Set();
 #endif 
+	// Bind vertex buffer to pipeline Input Assembler
 	UINT constexpr stride = sizeof(Vertex);
 	UINT constexpr offset = 0u;
 	pContext->IASetVertexBuffers(0u, 1u, &pVertexBuffer, &stride, &offset);
-	pContext->Draw(3u, 0u);
+
+	// Create Vertex Shader
+	wrl::ComPtr<ID3D11VertexShader> pVertShader;
+	wrl::ComPtr<ID3DBlob> pBlob;
+	D3DReadFileToBlob(L"VertexShader.cso", &pBlob);
+	pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertShader);
+	pContext->VSSetShader(pVertShader.Get(), nullptr, 0u);
+
+
+
+	pContext->Draw(std::size(vertices), 0u);
 #ifdef _DEBUG 
 	throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason(), infoManager.GetMessages());
 #else
