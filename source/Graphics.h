@@ -65,7 +65,7 @@ public:
 	void ClearBuffer(float red, float green, float blue);
 	void FrameEnd();
 
-	void DrawTestTri();
+	void DrawTestTri(float angle);
 
 private:
 #ifdef _DEBUG

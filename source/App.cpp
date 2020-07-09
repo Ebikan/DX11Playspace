@@ -7,7 +7,7 @@
 #include "Window.h"
 
 
-App::App(const wchar_t* name) : wnd(1200, 950, name) {}
+App::App(const wchar_t* name) : wnd(1400, 1200, name) {}
 
 int App::Go() {
 	while (true) {
@@ -23,10 +23,10 @@ void App::DoFrame() {
 
 	float const elapsedTime = timer.PeekStart()/2.f;
 	// Clear Screen
-	wnd.Gfx().ClearBuffer(fabsf(sinf(elapsedTime)), fabsf(sinf(elapsedTime/1.1f+0.19635f)), fabsf(sinf(elapsedTime/1.3f + 0.26635f)));
+	wnd.Gfx().ClearBuffer(fabsf(sinf(elapsedTime)/1.5f), fabsf(sinf(elapsedTime/1.1f+0.19635f)), fabsf(sinf(elapsedTime/1.3f + 0.26635f)));
 	// Frame Operations
 
-	wnd.Gfx().DrawTestTri();
+	wnd.Gfx().DrawTestTri(elapsedTime);
 
 	// End Frame
 	wnd.Gfx().FrameEnd();

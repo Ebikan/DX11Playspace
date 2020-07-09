@@ -17,9 +17,11 @@
 #include <sstream>
 #include <vector>
 #include <d3dcompiler.h>
+#include <DirectXMath.h>
 
-#pragma comment(lib, "D3DCompiler.lib")
+//#pragma comment(lib, "D3DCompiler.lib")
 //#pragma comment(lib, "d3d11.lib") force linker
+
 
 Graphics::Graphics(_In_ HWND hWnd) {
 
@@ -111,15 +113,20 @@ void Graphics::FrameEnd() {
 	}
 }
 
-void Graphics::DrawTestTri()
+void Graphics::DrawTestTri(float angle)
 {
 	namespace wrl = Microsoft::WRL;
+	namespace dx = DirectX;
+
+	DXGI_SWAP_CHAIN_DESC scDesc;
+	pSwapChain->GetDesc(&scDesc);
 
 	struct Vertex
 	{
 		struct Pos {
 			float x;
 			float y;
+			//float z;
 		} pos;
 		struct Color
 		{
@@ -132,36 +139,37 @@ void Graphics::DrawTestTri()
 
 	const Vertex vertices[] = {
 
-		{{0.0f, 0.5f},		{255u, 0u, 255u, 0u}},
+		{{0.0f, 0.5f},		{50u, 100u, 255u, 0u}},
 		{{0.3f, 0.3f},		{255u, 0u, 0u, 0u}},
-		{{0.2f, 0.2f},      {0u, 255u, 0u, 0u}},
+		{{0.2f, 0.2f},		{0u, 255u, 0u, 0u}},
+		{{-0.2f, 0.2f},		{200u, 0u, 200u, 0u}},
+		{{-0.3f, 0.3f},		{200u, 200u, 20u, 0u}},
+		{{0.0f, -0.5f},		{200u, 0u, 0u, 0u}},
 
-		{{0.0f, 0.5f},		{255u, 0u, 255u, 0u}},
-		{{0.2f, 0.2f},		{255u, 0u, 0u, 0u}},
-		{{-0.2f, 0.2f},		{0u, 255u, 0u, 0u}},
-		
-		{{0.0f, 0.5f},		{255u, 0u, 255u, 0u}},
-		{{-0.2f, 0.2f},		{255u, 0u, 0u, 0u}},
-		{{-0.3f, 0.3f},		{0u, 255u, 0u, 0u}},
+		//{{0.0f, 0.5f, -1.f},		{50u, 100u, 255u, 0u}},
+		//{{0.3f, 0.3f, -1.f},		{255u, 0u, 0u, 0u}},
+		//{{0.2f, 0.2f, -1.f},		{0u, 255u, 0u, 0u}},
+		//{{-0.2f, 0.2f, -1.f},		{200u, 0u, 200u, 0u}},
+		//{{-0.3f, 0.3f, -1.f},		{200u, 200u, 20u, 0u}},
+		//{{0.0f, -0.5f, -1.f},		{200u, 0u, 0u, 0u}},
 
-		{{0.0f, -0.5f},		{255u, 0u, 255u, 0u}},
-		{{0.2f, 0.2f},      {0u, 255u, 0u, 0u}},
-		{{0.3f, 0.3f},		{255u, 0u, 0u, 0u}},
-
-		{{0.0f, -0.5f},		{255u, 0u, 255u, 0u}},
-		{{-0.2f, 0.2f},		{0u, 255u, 0u, 0u}},
-		{{0.2f, 0.2f},		{255u, 0u, 0u, 0u}},
-
-		{{0.0f, -0.5f},		{255u, 0u, 255u, 0u}},
-		{{-0.3f, 0.3f},		{0u, 255u, 0u, 0u}},
-		{{-0.2f, 0.2f},		{255u, 0u, 0u, 0u}},
+		//{{0.0f, 0.5f, -1.f},		{50u, 100u, 255u, 0u}},
+		//{{0.3f, 0.3f, -1.f},		{255u, 0u, 0u, 0u}},
+		//{{0.2f, 0.2f, -1.f},		{0u, 255u, 0u, 0u}},
+		//{{-0.2f, 0.2f, -1.f},		{200u, 0u, 200u, 0u}},
+		//{{-0.3f, 0.3f, -1.f},		{200u, 200u, 20u, 0u}},
+		//{{0.0f, -0.5f, -1.f},		{200u, 0u, 0u, 0u}},
 
 	};
 
-	//const unsigned short vertFaces[] = {
-
-
-	//};
+	const unsigned short vertFaces[] = {
+		0,1,2,
+		0,2,3,
+		0,3,4,
+		1,5,2,
+		2,5,3,
+		3,5,4,
+	};
 
 	D3D11_BUFFER_DESC desc = {
 		sizeof(vertices),
@@ -179,9 +187,9 @@ void Graphics::DrawTestTri()
 
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
 	HRESULT const hr = pDevice->CreateBuffer(&desc, &srd, &pVertexBuffer);
-
+#ifdef _DEBUG
 	if (FAILED(hr)) throw Graphics::HResultException(__LOC__, hr, infoManager.GetMessages());
-
+#endif // _DEBUG
 
 
 #ifdef _DEBUG 
@@ -193,8 +201,53 @@ void Graphics::DrawTestTri()
 	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
 
 
-	wrl::ComPtr<ID3DBlob> pBlob;
+	wrl::ComPtr<ID3D11Buffer> pVertIndexBuffer;
+	D3D11_BUFFER_DESC vertIndexDesc = {
+		sizeof(vertFaces),
+		D3D11_USAGE_DEFAULT,
+		D3D11_BIND_INDEX_BUFFER,
+		NULL,
+		NULL,
+		sizeof(unsigned short),
+	};
+	D3D11_SUBRESOURCE_DATA indSrD = {};
+	indSrD.pSysMem = vertFaces;
+	pDevice->CreateBuffer(&vertIndexDesc, &indSrD, &pVertIndexBuffer);
+	pContext->IASetIndexBuffer(pVertIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
 
+	struct ConstantBuffer {
+		dx::XMMATRIX transform;
+	};
+
+
+	const ConstantBuffer cb =
+	{
+		{
+		dx::XMMatrixTranspose(
+			dx::XMMatrixRotationZ(angle) *
+			dx::XMMatrixScaling(static_cast<float> (scDesc.BufferDesc.Height) / static_cast<float> (scDesc.BufferDesc.Width), 1.f, 1.f)
+		)
+		}
+	};
+
+
+	D3D11_BUFFER_DESC cbDesc = {};
+	cbDesc.ByteWidth = sizeof(cb);
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.MiscFlags = NULL;
+	cbDesc.StructureByteStride = 0u;
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	D3D11_SUBRESOURCE_DATA pCBSubRes = {};
+	pCBSubRes.pSysMem = &cb;
+
+	wrl::ComPtr<ID3D11Buffer>pConstBuffer;
+	pDevice->CreateBuffer(&cbDesc, &pCBSubRes, &pConstBuffer);
+	pContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());
+
+
+	wrl::ComPtr<ID3DBlob> pBlob;
 	// Create Pixel Shader
 	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
 	D3DReadFileToBlob(L"PixelShader.cso", &pBlob);
@@ -224,8 +277,6 @@ void Graphics::DrawTestTri()
 
 
 	// Set Viewport
-	DXGI_SWAP_CHAIN_DESC scDesc;
-	pSwapChain->GetDesc(&scDesc);
 
 	D3D11_VIEWPORT view;
 	view.TopLeftX = 0;
@@ -241,7 +292,7 @@ void Graphics::DrawTestTri()
 
 
 	// Draw
-	pContext->Draw(static_cast<UINT> (std::size(vertices)), 0u);
+	pContext->DrawIndexed(static_cast<UINT> (std::size(vertFaces)), 0u, 0u);
 #ifdef _DEBUG 
 	if (FAILED(pDevice->GetDeviceRemovedReason())) throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason(), infoManager.GetMessages());
 #else
