@@ -25,21 +25,21 @@ Graphics::Graphics(_In_ HWND hWnd) {
 
 
 	DXGI_SWAP_CHAIN_DESC SwapChainDesc;
-	SwapChainDesc.BufferDesc.Width = 0;
-	SwapChainDesc.BufferDesc.Height = 0;
-	SwapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
-	SwapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
+	SwapChainDesc.BufferDesc.Width = 0u;
+	SwapChainDesc.BufferDesc.Height = 0u;
+	SwapChainDesc.BufferDesc.RefreshRate.Numerator = 0u;
+	SwapChainDesc.BufferDesc.RefreshRate.Denominator = 0u;
 	SwapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	SwapChainDesc.SampleDesc.Count = 1;
-	SwapChainDesc.SampleDesc.Quality = 0;
+	SwapChainDesc.SampleDesc.Count = 8u;
+	SwapChainDesc.SampleDesc.Quality = static_cast<UINT>(D3D11_STANDARD_MULTISAMPLE_PATTERN);
 	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	SwapChainDesc.BufferCount = 1;
+	SwapChainDesc.BufferCount = 1u;
 	SwapChainDesc.OutputWindow = hWnd;
 	SwapChainDesc.Windowed = true; //dont force, use IDXGISwapChain::SetFullscreenState
 	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;   //change to flip model in EvWin BLT 
-	SwapChainDesc.Flags = 0;
+	SwapChainDesc.Flags = 0u;
 
 
 #ifdef _DEBUG
@@ -117,14 +117,27 @@ void Graphics::DrawTestTri()
 
 	struct Vertex
 	{
-		float x;
-		float y;
+		struct Pos {
+			float x;
+			float y;
+		} pos;
+		struct Color
+		{
+			BYTE r;
+			BYTE g;
+			BYTE b;
+			BYTE a;
+		} color;
 	};
 
 	const Vertex vertices[] = {
-		{0.0f, 0.5f},
-		{0.5f, -0.5f},
-		{-0.5f, -0.5f},
+		{{0.0f, 0.5f},		{255u, 0u, 255u, 0u}},
+		{{0.5f, -0.5f},		{255u, 0u, 0u, 0u}},
+		{{-0.5f, -0.5f},	{0u, 255u, 0u, 0u}},
+		
+		{{0.5f, 1.f},		{255u, 0u, 255u, 0u}},
+		{{1.f, 1.f},		{255u, 0u, 0u, 0u}},
+		{{1.f, 0.5f},		{0u, 255u, 0u, 0u}},
 	};
 
 	D3D11_BUFFER_DESC desc = {
@@ -173,11 +186,11 @@ void Graphics::DrawTestTri()
 	// Bind Vertex Shader
 	pContext->VSSetShader(pVertShader.Get(), nullptr, 0u);
 
-
 	// Input layout for vertex shader for 2d
 	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ieDesc[] = {
-		{"POSITION", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u}
+		{"POSITION", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u},
+		{"COLOR", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u}
 	};
 	pDevice->CreateInputLayout(ieDesc, static_cast<UINT>(std::size(ieDesc)), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
 	pContext->IASetInputLayout(pInputLayout.Get());
