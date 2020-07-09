@@ -156,13 +156,8 @@ void Graphics::DrawTestTri()
 	UINT constexpr offset = 0u;
 	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
 
-	// Create Vertex Shader
-	wrl::ComPtr<ID3D11VertexShader> pVertShader;
+
 	wrl::ComPtr<ID3DBlob> pBlob;
-	D3DReadFileToBlob(L"VertexShader.cso", &pBlob);
-	pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertShader);
-	// Bind Vertex Shader
-	pContext->VSSetShader(pVertShader.Get(), nullptr, 0u);
 
 	// Create Pixel Shader
 	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
@@ -170,6 +165,23 @@ void Graphics::DrawTestTri()
 	pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader);
 	// Bind Pixel Shader
 	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
+
+	// Create Vertex Shader
+	wrl::ComPtr<ID3D11VertexShader> pVertShader;
+	D3DReadFileToBlob(L"VertexShader.cso", &pBlob);
+	pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertShader);
+	// Bind Vertex Shader
+	pContext->VSSetShader(pVertShader.Get(), nullptr, 0u);
+
+
+	// Input layout for vertex shader for 2d
+	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
+	const D3D11_INPUT_ELEMENT_DESC ieDesc[] = {
+		{"POSITION", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u}
+	};
+	pDevice->CreateInputLayout(ieDesc, static_cast<UINT>(std::size(ieDesc)), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
+	pContext->IASetInputLayout(pInputLayout.Get());
+
 
 	// Set Render Target
 	pContext->OMSetRenderTargets(1u, pTargetView.GetAddressOf(), nullptr);
@@ -182,8 +194,8 @@ void Graphics::DrawTestTri()
 	D3D11_VIEWPORT view;
 	view.TopLeftX = 0;
 	view.TopLeftY = 0;
-	view.Width = scDesc.BufferDesc.Width;
-	view.Height = scDesc.BufferDesc.Height;
+	view.Width = static_cast<float> (scDesc.BufferDesc.Width);
+	view.Height = static_cast<float> (scDesc.BufferDesc.Height);
 	view.MinDepth = 0;
 	view.MaxDepth = 1;
 	pContext->RSSetViewports(1u, &view);
@@ -192,19 +204,12 @@ void Graphics::DrawTestTri()
 	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
-	// Input layout for vertex shader for 2d
-	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
-	const D3D11_INPUT_ELEMENT_DESC ieDesc[] = {
-		{L"Position", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u}
-	};
-
-
 	// Draw
-	pContext->Draw(std::size(vertices), 0u);
+	pContext->Draw(static_cast<UINT> (std::size(vertices)), 0u);
 #ifdef _DEBUG 
-	throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason(), infoManager.GetMessages());
+	if (FAILED(pDevice->GetDeviceRemovedReason())) throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason(), infoManager.GetMessages());
 #else
-	throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason());
+	if (pDevice->GetDeviceRemovedReason()) throw Graphics::DeviceRemovedException(__LOC__, pDevice->GetDeviceRemovedReason());
 #endif
 
 
