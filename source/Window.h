@@ -55,6 +55,9 @@ public:
 	Window(Window&&) = delete;
 	Window& operator=(Window&&) = delete;
 	void ChangeTitle(_In_ const std::string& str) noexcept;
+	unsigned int Width() const noexcept;
+	unsigned int Height() const noexcept;
+
 	// static to process all messages for the WClass.
 	static std::optional<int> ProcessMessages() noexcept;
 	// graphics class accessor

@@ -31,6 +31,9 @@
     <Filter Include="Source Files\Debug Struff">
       <UniqueIdentifier>{77b8f82a-07a5-4e9e-93f3-190e6c4800b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{0a3f803e-e4a1-4d79-8a77-3d4573ce2639}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\WinMain.cpp">
@@ -122,5 +125,17 @@
     <Xml Include="RuleOfFive.snippet">
       <Filter>Source Files</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="source\VertexShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="source\PixelShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

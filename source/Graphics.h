@@ -27,7 +27,7 @@ public:
 	// HResult Exception
 	class HResultException : public BaseException {
 	public:
-		HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, std::vector<std::string> info = {"None"}) noexcept;
+		HResultException(_In_ const char* file, _In_ UINT lineNum, _In_ HRESULT handle, _In_opt_ std::vector<std::string> info = {"None"}) noexcept;
 		const char* what() const noexcept override;
 		const char* GetType() const noexcept override;
 		HRESULT GetErrorCode() const noexcept;
@@ -37,9 +37,22 @@ public:
 		std::string info;
 		HRESULT hResult;
 	};
+	class InfoException : public BaseException {
+	public:
+		InfoException(_In_ const char* file, _In_ UINT lineNum, _In_opt_ std::vector<std::string> infoMsgs = { "No Info" }) noexcept;
+		const char* what() const noexcept override;
+		const char* GetType() const noexcept override;
+		std::string GetErrorInfo() const noexcept;
+
+	private:
+		std::string info;
+
+	};
 	// Device was removed from the binding
 	class DeviceRemovedException : public HResultException {
+	public:
 		using HResultException::HResultException;
+		const char* GetType() const noexcept override;
 	};
 public:
 	Graphics(_In_ HWND hWnd);
@@ -48,9 +61,11 @@ public:
 	Graphics& operator=(const Graphics&) = delete;
 	Graphics(Graphics&&) = delete;
 	Graphics& operator=(Graphics&&) = delete;
-	
+
 	void ClearBuffer(float red, float green, float blue);
 	void FrameEnd();
+
+	void DrawTestTri();
 
 private:
 #ifdef _DEBUG

@@ -106,6 +106,16 @@ void Window::ChangeTitle(_In_ const std::string& str) noexcept {
 		SetWindowTextA(hWndSto, str.c_str());
 }
 
+unsigned int Window::Width() const noexcept
+{
+	return width;
+}
+
+unsigned int Window::Height() const noexcept
+{
+	return height;
+}
+
 // Message Pump
 std::optional<int> Window::ProcessMessages() noexcept {
 	// Run messages till out.
