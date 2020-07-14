@@ -8,10 +8,10 @@ cbuffer ConstantBuffer {
 };
 
 
-VSOut main(float2 pos : POSITION, float4 color : COLOR)
+VSOut main(float3 pos : POSITION, float4 color : COLOR)
 {
 	VSOut vso;
-	vso.pos = mul(float4(pos.x, pos.y, 0.f, 1.f), transform);
+	vso.pos = mul(float4(pos, 1.f), transform);
 	vso.color = color;
 	return vso;
 }

@@ -113,7 +113,7 @@ void Graphics::FrameEnd() {
 	}
 }
 
-void Graphics::DrawTestTri(float angle)
+void Graphics::DrawTestTri(float angle, float x, float y)
 {
 	namespace wrl = Microsoft::WRL;
 	namespace dx = DirectX;
@@ -126,7 +126,7 @@ void Graphics::DrawTestTri(float angle)
 		struct Pos {
 			float x;
 			float y;
-			//float z;
+			float z;
 		} pos;
 		struct Color
 		{
@@ -139,36 +139,46 @@ void Graphics::DrawTestTri(float angle)
 
 	const Vertex vertices[] = {
 
-		{{0.0f, 0.5f},		{50u, 100u, 255u, 0u}},
-		{{0.3f, 0.3f},		{255u, 0u, 0u, 0u}},
-		{{0.2f, 0.2f},		{0u, 255u, 0u, 0u}},
-		{{-0.2f, 0.2f},		{200u, 0u, 200u, 0u}},
-		{{-0.3f, 0.3f},		{200u, 200u, 20u, 0u}},
-		{{0.0f, -0.5f},		{200u, 0u, 0u, 0u}},
 
-		//{{0.0f, 0.5f, -1.f},		{50u, 100u, 255u, 0u}},
-		//{{0.3f, 0.3f, -1.f},		{255u, 0u, 0u, 0u}},
-		//{{0.2f, 0.2f, -1.f},		{0u, 255u, 0u, 0u}},
-		//{{-0.2f, 0.2f, -1.f},		{200u, 0u, 200u, 0u}},
-		//{{-0.3f, 0.3f, -1.f},		{200u, 200u, 20u, 0u}},
-		//{{0.0f, -0.5f, -1.f},		{200u, 0u, 0u, 0u}},
+		{ -1.0f,-1.0f,-1.0f,	{50u, 100u, 255u, 0u}},
+		{ 1.0f,-1.0f,-1.0f,	{255u, 0u, 0u, 0u}},
+		{ -1.0f,1.0f,-1.0f,	{0u, 255u, 0u, 0u}},
+		{ 1.0f,1.0f,-1.0f,	{200u, 0u, 200u, 0u}},
+		{ -1.0f,-1.0f,1.0f,	{200u, 200u, 20u, 0u}},
+		{ 1.0f,-1.0f,1.0f,	{200u, 0u, 0u, 0u}},
+		{ -1.0f,1.0f,1.0f,	{200u, 0u, 0u, 0u} },
+		{ 1.0f,1.0f,1.0f,	 {200u, 0u, 0u, 0u}},
 
-		//{{0.0f, 0.5f, -1.f},		{50u, 100u, 255u, 0u}},
-		//{{0.3f, 0.3f, -1.f},		{255u, 0u, 0u, 0u}},
-		//{{0.2f, 0.2f, -1.f},		{0u, 255u, 0u, 0u}},
-		//{{-0.2f, 0.2f, -1.f},		{200u, 0u, 200u, 0u}},
-		//{{-0.3f, 0.3f, -1.f},		{200u, 200u, 20u, 0u}},
-		//{{0.0f, -0.5f, -1.f},		{200u, 0u, 0u, 0u}},
+
+		//{{0.0f, 0.5f, 0.01f},			{50u, 100u, 255u, 0u}},
+		//{{0.3f, 0.3f, 0.01f},			{255u, 0u, 0u, 0u}},
+		//{{0.2f, 0.2f, 0.01f},			{0u, 255u, 0u, 0u}},
+		//{{-0.2f, 0.2f, 0.01f},		{200u, 0u, 200u, 0u}},
+		//{{-0.3f, 0.3f, 0.01f},		{200u, 200u, 20u, 0u}},
+		//{{0.0f, -0.5f, 0.01f},		{200u, 0u, 0u, 0u}},
+
+
+
+		//{{0.0f, 0.5f, -0.01f},		{50u, 100u, 255u, 0u}},
+		//{{0.3f, 0.3f, -0.01f},		{255u, 0u, 0u, 0u}},
+		//{{0.2f, 0.2f, -0.01f},		{0u, 255u, 0u, 0u}},
+		//{{-0.2f, 0.2f, -0.01f},		{200u, 0u, 200u, 0u}},
+		//{{-0.3f, 0.3f, -0.01f},		{200u, 200u, 20u, 0u}},
+		//{{0.0f, -0.5f, -0.01f},		{200u, 0u, 0u, 0u}},
+
+
 
 	};
 
 	const unsigned short vertFaces[] = {
-		0,1,2,
-		0,2,3,
-		0,3,4,
-		1,5,2,
-		2,5,3,
-		3,5,4,
+		0,2,1, 2,3,1,
+		1,3,5, 3,7,5,
+		2,6,3, 3,6,7,
+		4,5,7, 4,7,6,
+		0,4,2, 2,4,6,
+		0,1,4, 1,5,4
+
+
 	};
 
 	D3D11_BUFFER_DESC desc = {
@@ -225,7 +235,10 @@ void Graphics::DrawTestTri(float angle)
 		{
 		dx::XMMatrixTranspose(
 			dx::XMMatrixRotationZ(angle) *
-			dx::XMMatrixScaling(static_cast<float> (scDesc.BufferDesc.Height) / static_cast<float> (scDesc.BufferDesc.Width), 1.f, 1.f)
+			dx::XMMatrixRotationY(angle) *
+			dx::XMMatrixTranslation(x,y,4.f) *
+			dx::XMMatrixPerspectiveLH(1.f, static_cast<float> (scDesc.BufferDesc.Height)/ static_cast<float> (scDesc.BufferDesc.Width), 0.5f, 10.f)
+			
 		)
 		}
 	};
@@ -265,7 +278,7 @@ void Graphics::DrawTestTri(float angle)
 	// Input layout for vertex shader for 2d
 	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ieDesc[] = {
-		{"POSITION", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u},
+		{"POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u},
 		{"COLOR", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u}
 	};
 	pDevice->CreateInputLayout(ieDesc, static_cast<UINT>(std::size(ieDesc)), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);

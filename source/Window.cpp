@@ -106,12 +106,12 @@ void Window::ChangeTitle(_In_ const std::string& str) noexcept {
 		SetWindowTextA(hWndSto, str.c_str());
 }
 
-unsigned int Window::Width() const noexcept
+int Window::Width() const noexcept
 {
 	return width;
 }
 
-unsigned int Window::Height() const noexcept
+int Window::Height() const noexcept
 {
 	return height;
 }

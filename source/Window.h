@@ -55,8 +55,8 @@ public:
 	Window(Window&&) = delete;
 	Window& operator=(Window&&) = delete;
 	void ChangeTitle(_In_ const std::string& str) noexcept;
-	unsigned int Width() const noexcept;
-	unsigned int Height() const noexcept;
+	int Width() const noexcept;
+	int Height() const noexcept;
 
 	// static to process all messages for the WClass.
 	static std::optional<int> ProcessMessages() noexcept;
@@ -66,12 +66,13 @@ private:
 	static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT WINAPI HandleMsgUpdate(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+public:
+	MouseCapture mouse;
+	Keyboard kbd;
 private:
 	int width;
 	int height;
 	HWND hWndSto;
-	Keyboard kbd;
-	MouseCapture mouse;
 	std::unique_ptr<Graphics> pGfx;
 };
 
