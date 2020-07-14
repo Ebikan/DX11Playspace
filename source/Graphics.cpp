@@ -128,45 +128,19 @@ void Graphics::DrawTestTri(float angle, float x, float y)
 			float y;
 			float z;
 		} pos;
-		struct Color
-		{
-			BYTE r;
-			BYTE g;
-			BYTE b;
-			BYTE a;
-		} color;
 	};
 
 	const Vertex vertices[] = {
 
 
-		{ -1.0f,-1.0f,-1.0f,	{50u, 100u, 255u, 0u}},
-		{ 1.0f,-1.0f,-1.0f,	{255u, 0u, 0u, 0u}},
-		{ -1.0f,1.0f,-1.0f,	{0u, 255u, 0u, 0u}},
-		{ 1.0f,1.0f,-1.0f,	{200u, 0u, 200u, 0u}},
-		{ -1.0f,-1.0f,1.0f,	{200u, 200u, 20u, 0u}},
-		{ 1.0f,-1.0f,1.0f,	{200u, 0u, 0u, 0u}},
-		{ -1.0f,1.0f,1.0f,	{200u, 0u, 0u, 0u} },
-		{ 1.0f,1.0f,1.0f,	 {200u, 0u, 0u, 0u}},
-
-
-		//{{0.0f, 0.5f, 0.01f},			{50u, 100u, 255u, 0u}},
-		//{{0.3f, 0.3f, 0.01f},			{255u, 0u, 0u, 0u}},
-		//{{0.2f, 0.2f, 0.01f},			{0u, 255u, 0u, 0u}},
-		//{{-0.2f, 0.2f, 0.01f},		{200u, 0u, 200u, 0u}},
-		//{{-0.3f, 0.3f, 0.01f},		{200u, 200u, 20u, 0u}},
-		//{{0.0f, -0.5f, 0.01f},		{200u, 0u, 0u, 0u}},
-
-
-
-		//{{0.0f, 0.5f, -0.01f},		{50u, 100u, 255u, 0u}},
-		//{{0.3f, 0.3f, -0.01f},		{255u, 0u, 0u, 0u}},
-		//{{0.2f, 0.2f, -0.01f},		{0u, 255u, 0u, 0u}},
-		//{{-0.2f, 0.2f, -0.01f},		{200u, 0u, 200u, 0u}},
-		//{{-0.3f, 0.3f, -0.01f},		{200u, 200u, 20u, 0u}},
-		//{{0.0f, -0.5f, -0.01f},		{200u, 0u, 0u, 0u}},
-
-
+		{ -1.0f,-1.0f,-1.0f},
+		{ 1.0f,-1.0f,-1.0f},
+		{ -1.0f,1.0f,-1.0f},
+		{ 1.0f,1.0f,-1.0f},
+		{ -1.0f,-1.0f,1.0f},
+		{ 1.0f,-1.0f,1.0f},
+		{ -1.0f,1.0f,1.0f},
+		{ 1.0f,1.0f,1.0f},
 
 	};
 
@@ -260,6 +234,48 @@ void Graphics::DrawTestTri(float angle, float x, float y)
 	pContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());
 
 
+	struct ConstantBuffer2 {
+		struct {
+			float r;
+			float g;
+			float b;
+			float a;
+		} face_colors[6];
+	};
+	const ConstantBuffer2 cb2 =
+	{
+		{
+			{50.f, 56.f, 168.f, 255.f},
+			{150.f, 0.f, 0.f, 255.f},
+			{174, 255, 23, 255.f},
+			{43, 167, 186, 255.f},
+			{121, 136, 201, 255.f},
+			{129.f, 50.f, 168.f, 255.f},
+		}
+	};
+
+	D3D11_BUFFER_DESC cbDesc2;
+	cbDesc2.ByteWidth = sizeof(cb2);
+	cbDesc2.Usage = D3D11_USAGE_DEFAULT;
+	cbDesc2.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc2.CPUAccessFlags = 0u;
+	cbDesc2.MiscFlags = 0u;
+	cbDesc2.StructureByteStride = 0u;
+
+	wrl::ComPtr<ID3D11Buffer> cb2Buff;
+
+	D3D11_SUBRESOURCE_DATA cbSub2 = {};
+	cbSub2.pSysMem = &cb2;
+
+	pDevice->CreateBuffer(&cbDesc2, &cbSub2, &cb2Buff);
+
+	pContext->PSSetConstantBuffers(0u, 1u, cb2Buff.GetAddressOf());
+
+
+
+
+
+
 	wrl::ComPtr<ID3DBlob> pBlob;
 	// Create Pixel Shader
 	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
@@ -279,7 +295,6 @@ void Graphics::DrawTestTri(float angle, float x, float y)
 	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 	const D3D11_INPUT_ELEMENT_DESC ieDesc[] = {
 		{"POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u},
-		{"COLOR", 0u, DXGI_FORMAT_R8G8B8A8_UNORM, 0u, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0u}
 	};
 	pDevice->CreateInputLayout(ieDesc, static_cast<UINT>(std::size(ieDesc)), pBlob->GetBufferPointer(), pBlob->GetBufferSize(), &pInputLayout);
 	pContext->IASetInputLayout(pInputLayout.Get());
