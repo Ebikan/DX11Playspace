@@ -18,6 +18,7 @@
 #include "BaseException.h"
 
 class Graphics {
+	friend class Bindable;
 public:
 	// Standard Exception
 	class Exception : public BaseException {
@@ -68,13 +69,13 @@ public:
 	void DrawTestTri(float angle, float x = 0.f, float y = 0.f);
 
 private:
+
 #ifdef _DEBUG
 	DebugLayerInfo infoManager;
 #endif
-
 	Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
 };

@@ -34,6 +34,12 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{0a3f803e-e4a1-4d79-8a77-3d4573ce2639}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Bindable">
+      <UniqueIdentifier>{bc3d60dd-558a-4142-a02c-6e79bf0f1e08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Bindable\Drawable">
+      <UniqueIdentifier>{0868527a-237b-471d-868d-07f0373d31cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\WinMain.cpp">
@@ -68,6 +74,18 @@
     </ClCompile>
     <ClCompile Include="source\BaseException.cpp">
       <Filter>Source Files\Debug Struff</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Bindable.cpp">
+      <Filter>Source Files\Bindable</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Drawable.cpp">
+      <Filter>Source Files\Bindable\Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Topology.cpp">
+      <Filter>Source Files\Bindable</Filter>
+    </ClCompile>
+    <ClCompile Include="source\VertexBuffer.cpp">
+      <Filter>Source Files\Bindable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -111,6 +129,18 @@
     </ClInclude>
     <ClInclude Include="source\BaseException.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Bindable.h">
+      <Filter>Source Files\Bindable</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Drawable.h">
+      <Filter>Source Files\Bindable\Drawable</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Topology.h">
+      <Filter>Source Files\Bindable</Filter>
+    </ClInclude>
+    <ClInclude Include="source\VertexBuffer.h">
+      <Filter>Source Files\Bindable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

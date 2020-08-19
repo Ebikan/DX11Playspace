@@ -196,7 +196,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 	case WM_CLOSE:
 		WindowClass::SubWindowCount();
 		if (!WindowClass::WindowCount())
-			PostQuitMessage(99);
+			PostQuitMessage(69);
 		break;
 
 		/* ------- End Window Messages -------- */
